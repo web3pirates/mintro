@@ -1,10 +1,10 @@
-import type { NextConfig } from 'next';
+import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   images: {
-    domains: ['static.usernames.app-backend.toolsforhumanity.com'],
+    domains: ["static.usernames.app-backend.toolsforhumanity.com"],
   },
-  allowedDevOrigins: ['*'], // Add your dev origin here
+  allowedDevOrigins: ["https://mintro-two.vercel.app"], // Add your production origin here
   reactStrictMode: false,
 };
 
