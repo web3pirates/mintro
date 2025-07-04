@@ -13,10 +13,18 @@ const config: Config = {
         foreground: "#37474F",
         primary: "#4CAF50",
         secondary: "var(--secondary)",
-
+        
         "primary-accent": "var(--primary-accent)",
         "foreground-accent": "var(--foreground-accent)",
         "hero-background": "var(--hero-background)",
+        
+        // Light mode specific colors
+        "light-bg": "#ffffff",
+        "light-surface": "#f8f9fa",
+        "light-border": "#e5e7eb",
+        "light-text": "#1f2937",
+        "light-text-secondary": "#6b7280",
+        "light-hover": "#f3f4f6",
       },
     },
   },
