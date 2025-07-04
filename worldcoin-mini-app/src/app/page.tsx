@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { IDKitWidget } from "@worldcoin/idkit";
 import { Eye, Shield, Globe, CheckCircle, User, Coins } from "lucide-react";
+import { WORLDCOIN_CONFIG } from "@/config/worldcoin";
 
 export default function WorldCoinMiniApp() {
   const [isVerified, setIsVerified] = useState(false);
@@ -60,12 +61,14 @@ export default function WorldCoinMiniApp() {
 
                 {!isVerified ? (
                   <IDKitWidget
-                    app_id="app_staging_1234567890abcdef" // Replace with your actual app_id
-                    action="verify_user"
-                    signal="user_value"
+                    app_id={WORLDCOIN_CONFIG.APP_ID}
+                    action={WORLDCOIN_CONFIG.ACTION}
+                    signal={WORLDCOIN_CONFIG.SIGNAL}
                     onSuccess={handleSuccess}
-                    walletConnectProjectId="your_wallet_connect_project_id" // Optional
-                    verification_level="orb"
+                    walletConnectProjectId={
+                      WORLDCOIN_CONFIG.WALLET_CONNECT_PROJECT_ID
+                    }
+                    verification_level={WORLDCOIN_CONFIG.VERIFICATION_LEVEL}
                   >
                     {({ open }) => (
                       <button
