@@ -17,7 +17,7 @@ export default function Home() {
               Get Started
             </h2>
             <p className="text-gray-600">
-              Connect your wallet to access Mintro's features
+              Connect your wallet to access Mintro&apos;s features
             </p>
           </div>
           <AuthStatus />

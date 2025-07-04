@@ -156,7 +156,7 @@ export const MintroBranding = () => {
         </div>
 
         <div className="space-y-4">
-          {mockSwapNotifications.map((notification, index) => (
+          {mockSwapNotifications.map((notification) => (
             <div
               key={notification.id}
               className="flex items-start gap-4 p-4 bg-white rounded-lg shadow-sm border border-gray-100"
