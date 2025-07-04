@@ -2,7 +2,6 @@
 import { MiniKitProvider } from "@worldcoin/minikit-js/minikit-provider";
 import { Session } from "next-auth";
 import { SessionProvider } from "next-auth/react";
-import dynamic from "next/dynamic";
 import type { ReactNode } from "react";
 import { PrivyProvider } from "./PrivyProvider";
 
@@ -43,7 +42,9 @@ export default function ClientProviders({
       {/* <ErudaProvider> */}
       <PrivyProvider>
         <MiniKitProvider
-          app_id={process.env.NEXT_PUBLIC_WLD_CLIENT_ID as `app_${string}`}
+          props={{
+            appId: process.env.NEXT_PUBLIC_WLD_CLIENT_ID as `app_${string}`,
+          }}
         >
           <SessionProvider session={session}>{children}</SessionProvider>
         </MiniKitProvider>

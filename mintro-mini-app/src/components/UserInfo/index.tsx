@@ -4,6 +4,7 @@ import { usePrivy } from "@privy-io/react-auth";
 import { useMiniKit } from "@worldcoin/minikit-js/minikit-provider";
 import { MiniKit } from "@worldcoin/minikit-js";
 import { useEffect, useState } from "react";
+import Image from "next/image";
 
 interface UserInfo {
   address: string;
@@ -68,10 +69,12 @@ export const UserInfo = () => {
             {worldcoinUserInfo.profilePictureUrl && (
               <div>
                 <strong>Profile Picture:</strong>
-                <img
+                <Image
                   src={worldcoinUserInfo.profilePictureUrl}
                   alt="Profile"
-                  className="w-8 h-8 rounded-full ml-2 inline-block"
+                  width={32}
+                  height={32}
+                  className="rounded-full ml-2 inline-block"
                 />
               </div>
             )}
