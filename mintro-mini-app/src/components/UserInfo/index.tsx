@@ -1,29 +1,81 @@
-'use client';
-import { CircularIcon, Marble } from '@worldcoin/mini-apps-ui-kit-react';
-import { CheckCircleSolid } from 'iconoir-react';
-import { useSession } from 'next-auth/react';
+"use client";
 
-/**
- * Minikit is only available on client side. Thus user info needs to be rendered on client side.
- * UserInfo component displays user information including profile picture, username, and verification status.
- * It uses the Marble component from the mini-apps-ui-kit-react library to display the profile picture.
- * The component is client-side rendered.
- */
+import { usePrivy } from "@privy-io/react-auth";
+import { useMiniKit } from "@worldcoin/minikit-js/minikit-provider";
+import { MiniKit } from "@worldcoin/minikit-js";
+import { useEffect, useState } from "react";
+
+interface UserInfo {
+  address: string;
+  username?: string;
+  profilePictureUrl?: string;
+}
+
 export const UserInfo = () => {
-  // Fetching the user state client side
-  const session = useSession();
+  const { user, authenticated } = usePrivy();
+  const { isInstalled } = useMiniKit();
+  const [worldcoinUserInfo, setWorldcoinUserInfo] = useState<UserInfo | null>(
+    null
+  );
+
+  useEffect(() => {
+    const fetchWorldcoinUserInfo = async () => {
+      if (authenticated && user?.wallet?.address && isInstalled) {
+        try {
+          // Access the user's worldcoin information and wallet data
+          const userInfo = await MiniKit.getUserByAddress(user.wallet.address);
+          setWorldcoinUserInfo({
+            address: user.wallet.address,
+            username: userInfo?.username,
+            profilePictureUrl: userInfo?.profilePictureUrl,
+          });
+        } catch (error) {
+          console.error("Error fetching Worldcoin user info:", error);
+        }
+      }
+    };
+
+    fetchWorldcoinUserInfo();
+  }, [authenticated, user?.wallet?.address, isInstalled]);
+
+  if (!authenticated) {
+    return (
+      <div className="p-4 bg-gray-100 rounded-lg">
+        <p className="text-gray-600">Please log in to see your information</p>
+      </div>
+    );
+  }
 
   return (
-    <div className="flex flex-row items-center justify-start gap-4 rounded-xl w-full border-2 border-gray-200 p-4">
-      <Marble src={session?.data?.user?.profilePictureUrl} className="w-14" />
-      <div className="flex flex-row items-center justify-center">
-        <span className="text-lg font-semibold capitalize">
-          {session?.data?.user?.username}
-        </span>
-        {session?.data?.user?.profilePictureUrl && (
-          <CircularIcon size="sm" className="ml-0">
-            <CheckCircleSolid className="text-blue-600" />
-          </CircularIcon>
+    <div className="p-4 bg-white border rounded-lg shadow-sm">
+      <h3 className="text-lg font-semibold mb-4">User Information</h3>
+
+      <div className="space-y-3">
+        <div>
+          <strong>Privy User ID:</strong> {user?.id}
+        </div>
+
+        <div>
+          <strong>Wallet Address:</strong> {user?.wallet?.address}
+        </div>
+
+        {worldcoinUserInfo && (
+          <>
+            <div>
+              <strong>Worldcoin Username:</strong>{" "}
+              {worldcoinUserInfo.username || "Not available"}
+            </div>
+            {worldcoinUserInfo.profilePictureUrl && (
+              <div>
+                <strong>Profile Picture:</strong>
+                <img
+                  src={worldcoinUserInfo.profilePictureUrl}
+                  alt="Profile"
+                  className="w-8 h-8 rounded-full ml-2 inline-block"
+                />
+              </div>
+            )}
+          </>
         )}
       </div>
     </div>
