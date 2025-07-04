@@ -2,9 +2,19 @@
 
 import { usePrivy } from "@privy-io/react-auth";
 import { Button } from "@worldcoin/mini-apps-ui-kit-react";
+import { useMiniKit } from "@worldcoin/minikit-js/minikit-provider";
 
 export const AuthStatus = () => {
   const { authenticated, user, login, logout } = usePrivy();
+  const { isInstalled } = useMiniKit();
+
+  // Debug environment variables
+  console.log("Environment Debug:", {
+    NEXT_PUBLIC_WLD_CLIENT_ID: process.env.NEXT_PUBLIC_WLD_CLIENT_ID,
+    NEXT_PUBLIC_PRIVY_APP_ID: process.env.NEXT_PUBLIC_PRIVY_APP_ID,
+    isInstalled,
+    authenticated,
+  });
 
   if (authenticated) {
     return (
@@ -35,6 +45,19 @@ export const AuthStatus = () => {
       <p className="text-sm text-yellow-700 mb-3">
         Please log in using the button below to access the app.
       </p>
+      <div className="space-y-2 text-xs text-gray-600 mb-3">
+        <div>
+          <strong>Worldcoin App ID:</strong>{" "}
+          {process.env.NEXT_PUBLIC_WLD_CLIENT_ID || "Not set"}
+        </div>
+        <div>
+          <strong>Privy App ID:</strong>{" "}
+          {process.env.NEXT_PUBLIC_PRIVY_APP_ID || "Not set"}
+        </div>
+        <div>
+          <strong>MiniKit Installed:</strong> {isInstalled ? "Yes" : "No"}
+        </div>
+      </div>
       <Button onClick={login} size="sm" variant="primary">
         Login with Privy
       </Button>

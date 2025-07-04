@@ -6,10 +6,11 @@ import dynamic from "next/dynamic";
 import type { ReactNode } from "react";
 import { PrivyProvider } from "./PrivyProvider";
 
-const ErudaProvider = dynamic(
-  () => import("@/providers/Eruda").then((c) => c.ErudaProvider),
-  { ssr: false }
-);
+// Temporarily disable ErudaProvider to fix SSR issues
+// const ErudaProvider = dynamic(
+//   () => import("@/providers/Eruda").then((c) => c.ErudaProvider),
+//   { ssr: false }
+// );
 
 // Define props for ClientProviders
 interface ClientProvidersProps {
@@ -38,15 +39,16 @@ export default function ClientProviders({
 }: ClientProvidersProps) {
   return (
     <div suppressHydrationWarning>
-      <ErudaProvider>
-        <PrivyProvider>
-          <MiniKitProvider
-            app_id={process.env.NEXT_PUBLIC_WLD_CLIENT_ID as `app_${string}`}
-          >
-            <SessionProvider session={session}>{children}</SessionProvider>
-          </MiniKitProvider>
-        </PrivyProvider>
-      </ErudaProvider>
+      {/* Temporarily disabled ErudaProvider */}
+      {/* <ErudaProvider> */}
+      <PrivyProvider>
+        <MiniKitProvider
+          app_id={process.env.NEXT_PUBLIC_WLD_CLIENT_ID as `app_${string}`}
+        >
+          <SessionProvider session={session}>{children}</SessionProvider>
+        </MiniKitProvider>
+      </PrivyProvider>
+      {/* </ErudaProvider> */}
     </div>
   );
 }

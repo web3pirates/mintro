@@ -3,7 +3,7 @@ import { Button, LiveFeedback } from "@worldcoin/mini-apps-ui-kit-react";
 import { useMiniKit } from "@worldcoin/minikit-js/minikit-provider";
 import { MiniKit } from "@worldcoin/minikit-js";
 import { useLoginWithSiwe } from "@privy-io/react-auth";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 
 /**
  * This component integrates Privy SIWE with Worldcoin Mini App authentication
@@ -14,16 +14,43 @@ export const AuthButton = () => {
   const { isInstalled } = useMiniKit();
   const { generateSiweNonce, loginWithSiwe } = useLoginWithSiwe();
 
+  // Debug logging
+  console.log("AuthButton Debug Info:", {
+    isInstalled,
+    isPending,
+    hasGenerateSiweNonce: !!generateSiweNonce,
+    hasLoginWithSiwe: !!loginWithSiwe,
+    envVars: {
+      WLD_CLIENT_ID: process.env.NEXT_PUBLIC_WLD_CLIENT_ID,
+      PRIVY_APP_ID: process.env.NEXT_PUBLIC_PRIVY_APP_ID,
+    },
+  });
+
   const onClick = useCallback(async () => {
+    console.log("Button clicked! Checking conditions...");
+    console.log("isInstalled:", isInstalled);
+    console.log("isPending:", isPending);
+
     if (!isInstalled || isPending) {
+      console.log(
+        "Button click blocked - isInstalled:",
+        isInstalled,
+        "isPending:",
+        isPending
+      );
       return;
     }
+
+    console.log("Starting authentication process...");
     setIsPending(true);
     try {
       // Step 1: Get the nonce from Privy
+      console.log("Step 1: Generating Privy nonce...");
       const privyNonce = await generateSiweNonce();
+      console.log("Privy nonce generated:", privyNonce);
 
       // Step 2: Pass the nonce to Worldcoin walletAuth
+      console.log("Step 2: Calling Worldcoin walletAuth...");
       const { finalPayload } = await MiniKit.commandsAsync.walletAuth({
         nonce: privyNonce,
       });
@@ -31,6 +58,7 @@ export const AuthButton = () => {
       console.log("finalPayload structure:", finalPayload);
 
       // Step 3: Send the signed message and signature to Privy
+      console.log("Step 3: Calling Privy loginWithSiwe...");
       const user = await loginWithSiwe({
         message: (finalPayload as Record<string, unknown>)
           .siweMessage as string,
@@ -44,41 +72,6 @@ export const AuthButton = () => {
     } finally {
       setIsPending(false);
     }
-  }, [isInstalled, isPending, generateSiweNonce, loginWithSiwe]);
-
-  useEffect(() => {
-    const authenticate = async () => {
-      if (isInstalled && !isPending) {
-        setIsPending(true);
-        try {
-          // Step 1: Get the nonce from Privy
-          const privyNonce = await generateSiweNonce();
-
-          // Step 2: Pass the nonce to Worldcoin walletAuth
-          const { finalPayload } = await MiniKit.commandsAsync.walletAuth({
-            nonce: privyNonce,
-          });
-
-          console.log("finalPayload structure:", finalPayload);
-
-          // Step 3: Send the signed message and signature to Privy
-          const user = await loginWithSiwe({
-            message: (finalPayload as Record<string, unknown>)
-              .siweMessage as string,
-            signature: (finalPayload as Record<string, unknown>)
-              .siweSignature as string,
-          });
-
-          console.log("Successfully authenticated with Privy:", user);
-        } catch (error) {
-          console.error("Auto Privy SIWE authentication error", error);
-        } finally {
-          setIsPending(false);
-        }
-      }
-    };
-
-    authenticate();
   }, [isInstalled, isPending, generateSiweNonce, loginWithSiwe]);
 
   return (
@@ -97,6 +90,8 @@ export const AuthButton = () => {
         variant="primary"
       >
         Login with Privy + World App
+        {!isInstalled && " (World App not installed)"}
+        {isPending && " (Processing...)"}
       </Button>
     </LiveFeedback>
   );
