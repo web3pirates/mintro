@@ -46,6 +46,14 @@ export const useWorldcoinAuth = () => {
     };
 
     loadAuthData();
+
+    const handleAuthUpdate = () => {
+      loadAuthData();
+    };
+    window.addEventListener("worldcoin_auth_update", handleAuthUpdate);
+    return () => {
+      window.removeEventListener("worldcoin_auth_update", handleAuthUpdate);
+    };
   }, []);
 
   const loadUserInfo = async (address: string) => {

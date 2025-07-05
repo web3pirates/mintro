@@ -79,8 +79,7 @@ export const AuthButton = () => {
           payload: result.finalPayload,
         })
       );
-
-      // Redirect to protected home page
+      window.dispatchEvent(new Event("worldcoin_auth_update"));
       // router.push("/protected/home");
     } catch (error) {
       console.error("Worldcoin wallet authentication error", error);
