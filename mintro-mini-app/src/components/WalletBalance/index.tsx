@@ -1,6 +1,6 @@
 "use client";
 
-import { useSession } from "next-auth/react";
+import { useWorldcoinAuth } from "@/hooks/useWorldcoinAuth";
 import { useMiniKit } from "@worldcoin/minikit-js/minikit-provider";
 import { useEffect, useState } from "react";
 import { createPublicClient, http, formatEther } from "viem";
@@ -13,10 +13,10 @@ interface TokenBalance {
 }
 
 export const WalletBalance = () => {
-  const { data: session, status } = useSession();
+  const { user, isLoading, isAuthenticated } = useWorldcoinAuth();
   const { isInstalled } = useMiniKit();
   const [balances, setBalances] = useState<TokenBalance[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoadingBalances, setIsLoadingBalances] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   // Create viem client for blockchain interactions
@@ -27,15 +27,15 @@ export const WalletBalance = () => {
 
   useEffect(() => {
     const fetchBalances = async () => {
-      if (!session?.user?.walletAddress || !isInstalled) {
+      if (!isAuthenticated || !user?.address || !isInstalled) {
         return;
       }
 
-      setIsLoading(true);
+      setIsLoadingBalances(true);
       setError(null);
 
       try {
-        const address = session.user.walletAddress as `0x${string}`;
+        const address = user.address as `0x${string}`;
 
         // Get native token balance (WLD)
         const nativeBalance = await client.getBalance({ address });
@@ -51,14 +51,14 @@ export const WalletBalance = () => {
         console.error("Error fetching balances:", err);
         setError("Failed to fetch wallet balances");
       } finally {
-        setIsLoading(false);
+        setIsLoadingBalances(false);
       }
     };
 
     fetchBalances();
-  }, [session?.user?.walletAddress, isInstalled, client]);
+  }, [isAuthenticated, user?.address, isInstalled, client]);
 
-  if (status === "loading") {
+  if (isLoading) {
     return (
       <div className="p-4 bg-gray-100 rounded-lg">
         <p className="text-gray-600">Loading wallet information...</p>
@@ -66,7 +66,7 @@ export const WalletBalance = () => {
     );
   }
 
-  if (!session) {
+  if (!isAuthenticated) {
     return (
       <div className="p-4 bg-gray-100 rounded-lg">
         <p className="text-gray-600">
@@ -87,7 +87,7 @@ export const WalletBalance = () => {
     <div className="p-4 bg-white border rounded-lg shadow-sm">
       <h3 className="text-lg font-semibold mb-4">Wallet Balance</h3>
 
-      {isLoading && (
+      {isLoadingBalances && (
         <div className="text-center py-4">
           <p className="text-gray-600">Loading balances...</p>
         </div>
@@ -99,7 +99,7 @@ export const WalletBalance = () => {
         </div>
       )}
 
-      {!isLoading && !error && balances.length > 0 && (
+      {!isLoadingBalances && !error && balances.length > 0 && (
         <div className="space-y-3">
           {balances.map((token) => (
             <div
@@ -125,7 +125,7 @@ export const WalletBalance = () => {
         </div>
       )}
 
-      {!isLoading && !error && balances.length === 0 && (
+      {!isLoadingBalances && !error && balances.length === 0 && (
         <div className="text-center py-4">
           <p className="text-gray-600">No balances found</p>
         </div>
