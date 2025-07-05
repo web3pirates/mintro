@@ -18,6 +18,7 @@ export const DebugInfo = () => {
   const [debugInfo, setDebugInfo] = useState<Record<string, unknown>>({});
   const [copyStatus, setCopyStatus] = useState<string>("");
   const [consoleErrors, setConsoleErrors] = useState<ConsoleError[]>([]);
+  const [isExpanded, setIsExpanded] = useState(false);
 
   const copyToClipboard = async () => {
     try {
@@ -33,6 +34,10 @@ export const DebugInfo = () => {
 
   const clearErrors = () => {
     setConsoleErrors([]);
+  };
+
+  const toggleExpanded = () => {
+    setIsExpanded(!isExpanded);
   };
 
   useEffect(() => {
@@ -113,82 +118,123 @@ export const DebugInfo = () => {
   }, []);
 
   return (
-    <div className="p-4 bg-gray-900 text-white rounded-lg font-mono text-xs">
-      <div className="flex items-center justify-between mb-4">
-        <h3 className="text-lg font-semibold">Debug Information</h3>
-        <div className="flex items-center gap-2">
-          <Button
-            onClick={clearErrors}
-            size="sm"
-            variant="secondary"
-            className="text-xs text-white"
-          >
-            Clear Errors
-          </Button>
-          <Button
-            onClick={copyToClipboard}
-            size="sm"
-            variant="secondary"
-            className="text-xs text-white"
-          >
-            Copy All
-          </Button>
-          {copyStatus && (
-            <span className="text-xs text-green-400">{copyStatus}</span>
-          )}
+    <div className="bg-gray-900 text-white rounded-lg font-mono text-xs">
+      {/* Header with toggle button */}
+      <div
+        className="p-4 cursor-pointer hover:bg-gray-800 transition-colors rounded-t-lg"
+        onClick={toggleExpanded}
+      >
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <h3 className="text-lg font-semibold">Debug Information</h3>
+            {consoleErrors.length > 0 && (
+              <span className="bg-red-500 text-white text-xs px-2 py-1 rounded-full">
+                {consoleErrors.length}
+              </span>
+            )}
+          </div>
+          <div className="flex items-center gap-2">
+            <span className="text-sm text-gray-400">
+              {isExpanded ? "Hide" : "Show"}
+            </span>
+            <svg
+              className={`w-4 h-4 transition-transform ${
+                isExpanded ? "rotate-180" : ""
+              }`}
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M19 9l-7 7-7-7"
+              />
+            </svg>
+          </div>
         </div>
       </div>
 
-      {/* Console Errors Section */}
-      {consoleErrors.length > 0 && (
-        <div className="mb-4">
-          <h4 className="text-md font-semibold mb-2 text-red-400">
-            Console Errors ({consoleErrors.length})
-          </h4>
-          <div className="space-y-2 max-h-40 overflow-y-auto">
-            {consoleErrors.map((error, index) => (
-              <div
-                key={index}
-                className={`p-2 rounded text-xs ${
-                  error.type === "error"
-                    ? "bg-red-900 text-red-200"
-                    : error.type === "warn"
-                    ? "bg-yellow-900 text-yellow-200"
-                    : "bg-blue-900 text-blue-200"
-                }`}
+      {/* Collapsible content */}
+      {isExpanded && (
+        <div className="px-4 pb-4 border-t border-gray-700">
+          <div className="flex items-center justify-between mb-4 pt-4">
+            <div className="flex items-center gap-2">
+              <Button
+                onClick={clearErrors}
+                size="sm"
+                variant="secondary"
+                className="text-xs text-white"
               >
-                <div className="flex items-center gap-2 mb-1">
-                  <span className="font-semibold">
-                    {error.type.toUpperCase()}
-                  </span>
-                  <span className="text-gray-400">
-                    {new Date(error.timestamp).toLocaleTimeString()}
-                  </span>
-                </div>
-                <div className="font-mono">{error.message}</div>
-                {error.stack && (
-                  <details className="mt-1">
-                    <summary className="cursor-pointer text-gray-400">
-                      Stack trace
-                    </summary>
-                    <pre className="text-xs mt-1 text-gray-300 whitespace-pre-wrap">
-                      {error.stack}
-                    </pre>
-                  </details>
-                )}
+                Clear Errors
+              </Button>
+              <Button
+                onClick={copyToClipboard}
+                size="sm"
+                variant="secondary"
+                className="text-xs text-white"
+              >
+                Copy All
+              </Button>
+              {copyStatus && (
+                <span className="text-xs text-green-400">{copyStatus}</span>
+              )}
+            </div>
+          </div>
+
+          {/* Console Errors Section */}
+          {consoleErrors.length > 0 && (
+            <div className="mb-4">
+              <h4 className="text-md font-semibold mb-2 text-red-400">
+                Console Errors ({consoleErrors.length})
+              </h4>
+              <div className="space-y-2 max-h-40 overflow-y-auto">
+                {consoleErrors.map((error, index) => (
+                  <div
+                    key={index}
+                    className={`p-2 rounded text-xs ${
+                      error.type === "error"
+                        ? "bg-red-900 text-red-200"
+                        : error.type === "warn"
+                        ? "bg-yellow-900 text-yellow-200"
+                        : "bg-blue-900 text-blue-200"
+                    }`}
+                  >
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className="font-semibold">
+                        {error.type.toUpperCase()}
+                      </span>
+                      <span className="text-gray-400">
+                        {new Date(error.timestamp).toLocaleTimeString()}
+                      </span>
+                    </div>
+                    <div className="font-mono">{error.message}</div>
+                    {error.stack && (
+                      <details className="mt-1">
+                        <summary className="cursor-pointer text-gray-400">
+                          Stack trace
+                        </summary>
+                        <pre className="text-xs mt-1 text-gray-300 whitespace-pre-wrap">
+                          {error.stack}
+                        </pre>
+                      </details>
+                    )}
+                  </div>
+                ))}
               </div>
-            ))}
+            </div>
+          )}
+
+          {/* Debug Info Section */}
+          <div>
+            <h4 className="text-md font-semibold mb-2">System Information</h4>
+            <pre className="whitespace-pre-wrap overflow-auto">
+              {JSON.stringify(debugInfo, null, 2)}
+            </pre>
           </div>
         </div>
       )}
-
-      {/* Debug Info Section */}
-      <div>
-        <h4 className="text-md font-semibold mb-2">System Information</h4>
-        <pre className="whitespace-pre-wrap overflow-auto">
-          {JSON.stringify(debugInfo, null, 2)}
-        </pre>
-      </div>
     </div>
   );
 };
