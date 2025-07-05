@@ -15,7 +15,7 @@ const getPackageVersions = () => {
 
 interface ConsoleError {
   timestamp: string;
-  type: "error" | "warn" | "info";
+  type: "error" | "warn" | "info" | "log";
   message: string;
   stack?: string;
 }
@@ -88,7 +88,12 @@ export const DebugInfo = () => {
         ];
 
         const provider = new ethers.JsonRpcProvider(rpcUrl);
-        const contract = new ethers.Contract(WLD_CONTRACT, ERC20_ABI, provider);
+        const checksummedAddress = ethers.getAddress(WLD_CONTRACT);
+        const contract = new ethers.Contract(
+          checksummedAddress,
+          ERC20_ABI,
+          provider
+        );
 
         const [rawBalance, decimals] = await Promise.all([
           contract.balanceOf(user.address),
@@ -163,20 +168,24 @@ export const DebugInfo = () => {
     balanceError,
   ]);
 
-  // Capture console errors
+  // Capture console logs
   useEffect(() => {
     if (typeof window === "undefined") return;
 
     const originalError = console.error;
     const originalWarn = console.warn;
     const originalInfo = console.info;
+    const originalLog = console.log;
 
-    const addError = (type: "error" | "warn" | "info", ...args: unknown[]) => {
+    const addLog = (
+      type: "error" | "warn" | "info" | "log",
+      ...args: unknown[]
+    ) => {
       const message = args
         .map((arg) => (typeof arg === "string" ? arg : JSON.stringify(arg)))
         .join(" ");
 
-      const error: ConsoleError = {
+      const logEntry: ConsoleError = {
         timestamp: new Date().toISOString(),
         type,
         message,
@@ -186,30 +195,36 @@ export const DebugInfo = () => {
       // Use setTimeout to defer state update and avoid render phase issues
       setTimeout(() => {
         if (isMountedRef.current) {
-          setConsoleErrors((prev) => [...prev, error]);
+          setConsoleErrors((prev) => [...prev, logEntry]);
         }
       }, 0);
     };
 
     console.error = (...args) => {
-      addError("error", ...args);
+      addLog("error", ...args);
       originalError.apply(console, args);
     };
 
     console.warn = (...args) => {
-      addError("warn", ...args);
+      addLog("warn", ...args);
       originalWarn.apply(console, args);
     };
 
     console.info = (...args) => {
-      addError("info", ...args);
+      addLog("info", ...args);
       originalInfo.apply(console, args);
+    };
+
+    console.log = (...args) => {
+      addLog("log", ...args);
+      originalLog.apply(console, args);
     };
 
     return () => {
       console.error = originalError;
       console.warn = originalWarn;
       console.info = originalInfo;
+      console.log = originalLog;
     };
   }, []);
 
@@ -272,7 +287,7 @@ export const DebugInfo = () => {
                   variant="secondary"
                   className="text-xs text-white"
                 >
-                  Clear Errors ({consoleErrors.length})
+                  Clear Logs ({consoleErrors.length})
                 </Button>
               )}
             </div>
@@ -286,10 +301,10 @@ export const DebugInfo = () => {
             </pre>
           </div>
 
-          {/* Console Errors */}
+          {/* Console Logs */}
           {consoleErrors.length > 0 && (
             <div>
-              <h4 className="text-sm font-semibold mb-2">Console Errors:</h4>
+              <h4 className="text-sm font-semibold mb-2">Console Logs:</h4>
               <div className="space-y-2 max-h-64 overflow-y-auto">
                 {consoleErrors.map((error, index) => (
                   <div
@@ -299,6 +314,8 @@ export const DebugInfo = () => {
                         ? "bg-red-900 text-red-100"
                         : error.type === "warn"
                         ? "bg-yellow-900 text-yellow-100"
+                        : error.type === "log"
+                        ? "bg-green-900 text-green-100"
                         : "bg-blue-900 text-blue-100"
                     }`}
                   >

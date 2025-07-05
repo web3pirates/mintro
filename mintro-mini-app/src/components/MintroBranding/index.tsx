@@ -87,7 +87,7 @@ const getTypeIcon = (type: string) => {
   }
 };
 
-const WLD_CONTRACT = "0x163f8C2467924be0ae7B5347228C0F3Fc0cC008e"; // WLD token contract on World Chain
+const WLD_CONTRACT = "0x163f8C2467924be0ae7B5347228C0F3Fc0cC008e"; // WLD token contract on World Chain - needs checksum
 const ERC20_ABI = [
   "function balanceOf(address owner) view returns (uint256)",
   "function decimals() view returns (uint8)",
@@ -135,9 +135,14 @@ export const MintroBranding = () => {
         console.log("Network: World Chain (Worldcoin's blockchain)");
 
         const provider = new ethers.JsonRpcProvider(rpcUrl);
-        const contract = new ethers.Contract(WLD_CONTRACT, ERC20_ABI, provider);
-
+        const checksummedAddress = ethers.getAddress(WLD_CONTRACT);
         console.log("Contract address:", WLD_CONTRACT);
+        console.log("Checksummed address:", checksummedAddress);
+        const contract = new ethers.Contract(
+          checksummedAddress,
+          ERC20_ABI,
+          provider
+        );
 
         const [rawBalance, decimals] = await Promise.all([
           contract.balanceOf(user.address),
@@ -173,7 +178,7 @@ export const MintroBranding = () => {
             Mintro
           </h1>
           <h3 className="text-lg font-semibold">
-            Your intelligent DeFi companion v0.12
+            Your intelligent DeFi companion v0.13
           </h3>
         </div>
       </div>
