@@ -18,7 +18,7 @@ class FearGreedController {
         }
       );
 
-      console.log("✅ CoinMarketCap API Response Status:", response.data);
+      // console.log("✅ CoinMarketCap API Response Status:", response.data);
 
       if (response.data.status.error_code !== "0") {
         console.error("❌ CoinMarketCap API Error:", response.data.status);
@@ -81,7 +81,7 @@ class FearGreedController {
         }
       );
 
-      console.log("✅ CoinMarketCap API Response Status:", response.data);
+      // console.log("✅ CoinMarketCap API Response Status:", response.data);
 
       if (response.data.status.error_code !== "0") {
         console.error("❌ CoinMarketCap API Error:", response.data.status);
