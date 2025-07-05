@@ -2,16 +2,14 @@
 
 import { usePrivy } from "@privy-io/react-auth";
 import { useMiniKit } from "@worldcoin/minikit-js/minikit-provider";
-import { MiniKit, Tokens, tokenToDecimals } from "@worldcoin/minikit-js";
 import { useEffect, useState } from "react";
-import { createPublicClient, http, formatEther, formatUnits } from "viem";
+import { createPublicClient, http, formatEther } from "viem";
 import { worldchain } from "viem/chains";
 
 interface TokenBalance {
   symbol: string;
   balance: string;
   formattedBalance: string;
-  decimals: number;
 }
 
 export const WalletBalance = () => {
@@ -37,58 +35,18 @@ export const WalletBalance = () => {
       setError(null);
 
       try {
-        const address = user.wallet.address;
-        const balancePromises: Promise<TokenBalance>[] = [];
+        const address = user.wallet.address as `0x${string}`;
 
-        // Get native token balance (ETH/WLD)
+        // Get native token balance (WLD)
         const nativeBalance = await client.getBalance({ address });
-        balancePromises.push(
-          Promise.resolve({
+
+        setBalances([
+          {
             symbol: "WLD",
             balance: nativeBalance.toString(),
             formattedBalance: formatEther(nativeBalance),
-            decimals: 18,
-          })
-        );
-
-        // Get token balances using MiniKit
-        const supportedTokens = [
-          { symbol: Tokens.USDC, decimals: 6 },
-          { symbol: Tokens.USDT, decimals: 6 },
-          { symbol: Tokens.DAI, decimals: 18 },
-        ];
-
-        for (const token of supportedTokens) {
-          try {
-            const balance = await MiniKit.getTokenBalance({
-              address,
-              symbol: token.symbol,
-            });
-
-            balancePromises.push(
-              Promise.resolve({
-                symbol: token.symbol,
-                balance: balance.toString(),
-                formattedBalance: formatUnits(balance, token.decimals),
-                decimals: token.decimals,
-              })
-            );
-          } catch (err) {
-            console.warn(`Failed to fetch ${token.symbol} balance:`, err);
-            // Add zero balance for failed tokens
-            balancePromises.push(
-              Promise.resolve({
-                symbol: token.symbol,
-                balance: "0",
-                formattedBalance: "0",
-                decimals: token.decimals,
-              })
-            );
-          }
-        }
-
-        const tokenBalances = await Promise.all(balancePromises);
-        setBalances(tokenBalances);
+          },
+        ]);
       } catch (err) {
         console.error("Error fetching balances:", err);
         setError("Failed to fetch wallet balances");
@@ -110,7 +68,7 @@ export const WalletBalance = () => {
     );
   }
 
-  const formatBalance = (balance: string, decimals: number) => {
+  const formatBalance = (balance: string) => {
     const num = parseFloat(balance);
     if (num === 0) return "0";
     if (num < 0.0001) return "< 0.0001";
@@ -150,7 +108,7 @@ export const WalletBalance = () => {
               </div>
               <div className="text-right">
                 <div className="font-semibold">
-                  {formatBalance(token.formattedBalance, token.decimals)}
+                  {formatBalance(token.formattedBalance)}
                 </div>
                 <div className="text-xs text-gray-500">{token.symbol}</div>
               </div>
