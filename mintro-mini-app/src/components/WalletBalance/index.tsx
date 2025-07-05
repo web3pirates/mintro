@@ -1,9 +1,8 @@
 "use client";
 
 import { useWorldcoinAuth } from "@/hooks/useWorldcoinAuth";
-import { useMiniKit } from "@worldcoin/minikit-js/minikit-provider";
-import { useEffect, useState } from "react";
-import { createPublicClient, http, formatEther } from "viem";
+import { useEffect, useState, useMemo } from "react";
+import { createPublicClient, http, formatEther, getAddress } from "viem";
 import { worldchain } from "viem/chains";
 
 interface TokenBalance {
@@ -12,22 +11,42 @@ interface TokenBalance {
   formattedBalance: string;
 }
 
+// WLD token contract address on Worldcoin chain
+const WLD_TOKEN_ADDRESS = "0x2cFc85d8E48F8EAB294be644d9E25C3030863003";
+
+// ERC-20 ABI for balance and decimals
+const ERC20_ABI = [
+  {
+    inputs: [{ name: "owner", type: "address" }],
+    name: "balanceOf",
+    outputs: [{ name: "", type: "uint256" }],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "decimals",
+    outputs: [{ name: "", type: "uint8" }],
+    stateMutability: "view",
+    type: "function",
+  },
+] as const;
+
 export const WalletBalance = () => {
   const { user, isLoading, isAuthenticated } = useWorldcoinAuth();
-  const { isInstalled } = useMiniKit();
   const [balances, setBalances] = useState<TokenBalance[]>([]);
   const [isLoadingBalances, setIsLoadingBalances] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Create viem client for blockchain interactions
-  const client = createPublicClient({
+  // Create viem client for blockchain interactions - memoized to prevent re-creation
+  const client = useMemo(() => createPublicClient({
     chain: worldchain,
     transport: http("https://worldchain-mainnet.g.alchemy.com/public"),
-  });
+  }), []);
 
   useEffect(() => {
     const fetchBalances = async () => {
-      if (!isAuthenticated || !user?.address || !isInstalled) {
+      if (!isAuthenticated || !user?.address) {
         return;
       }
 
@@ -35,28 +54,56 @@ export const WalletBalance = () => {
       setError(null);
 
       try {
-        const address = user.address as `0x${string}`;
+        // Ensure the address is properly checksummed
+        const address = getAddress(user.address);
 
-        // Get native token balance (WLD)
-        const nativeBalance = await client.getBalance({ address });
+        console.log("Fetching WLD balance for address:", address);
+
+        // Read WLD token balance using contract call
+        const [balance, decimals] = await Promise.all([
+          client.readContract({
+            address: WLD_TOKEN_ADDRESS as `0x${string}`,
+            abi: ERC20_ABI,
+            functionName: 'balanceOf',
+            args: [address],
+          }),
+          client.readContract({
+            address: WLD_TOKEN_ADDRESS as `0x${string}`,
+            abi: ERC20_ABI,
+            functionName: 'decimals',
+            args: [],
+          }),
+        ]);
+
+        console.log("WLD balance (raw):", balance.toString());
+        console.log("WLD decimals:", decimals);
+
+        // Format the balance using the correct decimals
+        const formattedBalance = formatEther(balance);
+
+        console.log("WLD balance (formatted):", formattedBalance);
 
         setBalances([
           {
             symbol: "WLD",
-            balance: nativeBalance.toString(),
-            formattedBalance: formatEther(nativeBalance),
+            balance: Number(balance).toString(),
+            formattedBalance: formattedBalance,
           },
         ]);
       } catch (err) {
-        console.error("Error fetching balances:", err);
-        setError("Failed to fetch wallet balances");
+        console.error("Error fetching WLD balance:", err);
+        if (err instanceof Error) {
+          setError(`Failed to fetch WLD balance: ${err.message}`);
+        } else {
+          setError("Failed to fetch wallet balances");
+        }
       } finally {
         setIsLoadingBalances(false);
       }
     };
 
     fetchBalances();
-  }, [isAuthenticated, user?.address, isInstalled, client]);
+  }, [isAuthenticated, user?.address]); // Removed client from dependencies
 
   if (isLoading) {
     return (
