@@ -2,6 +2,7 @@ import { Page } from "@/components/PageLayout";
 import { AuthButton } from "../components/AuthButton";
 import { AuthStatus } from "../components/AuthStatus";
 import { MintroBranding } from "../components/MintroBranding";
+import { DebugInfo } from "../components/DebugInfo";
 
 export default function Home() {
   return (
@@ -21,6 +22,9 @@ export default function Home() {
             <AuthButton />
           </div>
         </div>
+
+        {/* Debug Information - Always at the bottom */}
+        <DebugInfo />
       </Page.Main>
     </Page>
   );

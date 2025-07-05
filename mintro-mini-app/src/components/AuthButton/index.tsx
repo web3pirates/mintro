@@ -75,24 +75,44 @@ export const AuthButton = () => {
   }, [isInstalled, isPending, generateSiweNonce, loginWithSiwe]);
 
   return (
-    <LiveFeedback
-      label={{
-        failed: "Failed to login",
-        pending: "Logging in",
-        success: "Logged in",
-      }}
-      state={isPending ? "pending" : undefined}
-    >
-      <Button
-        onClick={onClick}
-        disabled={isPending}
-        size="lg"
-        variant="primary"
+    <div className="space-y-4">
+      <LiveFeedback
+        label={{
+          failed: "Failed to login",
+          pending: "Logging in",
+          success: "Logged in",
+        }}
+        state={isPending ? "pending" : undefined}
       >
-        Login with Privy + World App
-        {!isInstalled && " (World App not installed)"}
-        {isPending && " (Processing...)"}
-      </Button>
-    </LiveFeedback>
+        <Button
+          onClick={onClick}
+          disabled={isPending || isInstalled === false}
+          size="lg"
+          variant="primary"
+        >
+          Login with Privy + World App
+          {isInstalled === false && " (World App not installed)"}
+          {isInstalled === undefined && " (Checking World App...)"}
+          {isPending && " (Processing...)"}
+        </Button>
+      </LiveFeedback>
+
+      {isInstalled === false && (
+        <div className="text-center p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+          <p className="text-sm text-yellow-800">
+            ⚠️ World App is not detected. Make sure you are running this app
+            within the World App environment.
+          </p>
+        </div>
+      )}
+
+      {isInstalled === undefined && (
+        <div className="text-center p-4 bg-blue-50 border border-blue-200 rounded-lg">
+          <p className="text-sm text-blue-800">
+            🔍 Detecting World App environment...
+          </p>
+        </div>
+      )}
+    </div>
   );
 };
