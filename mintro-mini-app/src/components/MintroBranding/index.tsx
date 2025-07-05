@@ -176,16 +176,12 @@ export const MintroBranding = () => {
             <p className="text-white">Loading...</p>
           </div>
         ) : isAuthenticated ? (
-          <div className="space-y-4">
-            <Button size="lg" variant="primary" className="px-8">
-              🚀 Start Trading
-            </Button>
-            <p className="text-sm text-white">
-              Ready to optimize your DeFi strategy?
-            </p>
-          </div>
+          <div className="space-y-4"></div>
         ) : (
           <div className="space-y-4">
+            <Button size="lg" variant="primary" className="px-8">
+              Login with World App Wallet
+            </Button>
             <p className="text-white">
               Connect your World App wallet to start tracking your DeFi
               portfolio
