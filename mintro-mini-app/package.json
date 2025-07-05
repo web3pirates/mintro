@@ -15,7 +15,7 @@
   "dependencies": {
     "@privy-io/react-auth": "^2.17.3",
     "@privy-io/server-auth": "^1.28.2",
-    "@worldcoin/mini-apps-ui-kit-react": "^1.0.2",
+    "@worldcoin/mini-apps-ui-kit-react": "^1.2.4",
     "@worldcoin/minikit-js": "^1.9.6",
     "@worldcoin/minikit-react": "1.9.6",
     "clsx": "^2.1.1",

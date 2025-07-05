@@ -2595,7 +2595,7 @@
     ox "^0.1.0"
     zustand "^4.5"
 
-"@worldcoin/mini-apps-ui-kit-react@^1.0.2":
+"@worldcoin/mini-apps-ui-kit-react@^1.2.4":
   version "1.2.4"
   resolved "https://registry.yarnpkg.com/@worldcoin/mini-apps-ui-kit-react/-/mini-apps-ui-kit-react-1.2.4.tgz#9b119aac2314bd20b80fff42fc3f98ee03f50ffd"
   integrity sha512-rF0SIdjrL14iKUIhD9B+7ms4Mogd2OqdMgZhgbb7I21+jXsVK9/g1kZsxfieXd9taxk799/JwqPI3evGLzatog==
