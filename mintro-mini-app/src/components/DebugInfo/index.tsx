@@ -5,6 +5,25 @@ import { useMiniKit } from "@worldcoin/minikit-js/minikit-provider";
 import { useEffect, useState } from "react";
 import { Button } from "@worldcoin/mini-apps-ui-kit-react";
 
+// Function to get package versions dynamically
+const getPackageVersions = async () => {
+  try {
+    const response = await fetch("/package.json");
+    const packageJson = await response.json();
+    return {
+      minikitJs: packageJson.dependencies["@worldcoin/minikit-js"] || "unknown",
+      minikitReact:
+        packageJson.dependencies["@worldcoin/minikit-react"] || "unknown",
+    };
+  } catch (error) {
+    console.error("Failed to load package.json:", error);
+    return {
+      minikitJs: "unknown",
+      minikitReact: "unknown",
+    };
+  }
+};
+
 interface ConsoleError {
   timestamp: string;
   type: "error" | "warn" | "info";
@@ -25,6 +44,10 @@ export const DebugInfo = () => {
   const [copyStatus, setCopyStatus] = useState<string>("");
   const [consoleErrors, setConsoleErrors] = useState<ConsoleError[]>([]);
   const [isExpanded, setIsExpanded] = useState(false);
+  const [packageVersions, setPackageVersions] = useState<{
+    minikitJs: string;
+    minikitReact: string;
+  }>({ minikitJs: "loading...", minikitReact: "loading..." });
 
   const copyToClipboard = async () => {
     try {
@@ -46,6 +69,11 @@ export const DebugInfo = () => {
     setIsExpanded(!isExpanded);
   };
 
+  // Load package versions
+  useEffect(() => {
+    getPackageVersions().then(setPackageVersions);
+  }, []);
+
   useEffect(() => {
     const info = {
       privy: {
@@ -61,6 +89,7 @@ export const DebugInfo = () => {
       },
       minikit: {
         isInstalled,
+        versions: packageVersions,
       },
       environment: {
         WLD_CLIENT_ID: maskSensitiveData(process.env.NEXT_PUBLIC_WLD_CLIENT_ID),
