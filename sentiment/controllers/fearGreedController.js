@@ -6,11 +6,12 @@ class FearGreedController {
       console.log("🔍 Fetching Fear and Greed Index from CoinMarketCap...");
       console.log("📋 API Key present:", !!process.env.CMC_API_KEY);
 
+      // Fetch both latest and historical data for trend calculation
       const response = await axios.get(
         "https://pro-api.coinmarketcap.com/v3/fear-and-greed/historical",
         {
           params: {
-            limit: 1,
+            limit: 8, // Get 8 days to calculate 7-day trend
           },
           headers: {
             "X-CMC_PRO_API_KEY": process.env.CMC_API_KEY,
@@ -27,13 +28,82 @@ class FearGreedController {
         );
       }
 
-      const latest = response.data.data[0];
+      const data = response.data.data;
+      const latest = data[0];
       console.log("🎯 Latest Fear and Greed Data:", latest);
+
+      // Calculate trend based on last 7 days (excluding today)
+      const lastWeekData = data.slice(1, 8); // Days 1-7 (excluding today)
+      const lastWeekAverage =
+        lastWeekData.reduce((sum, day) => sum + day.value, 0) /
+        lastWeekData.length;
+      const currentValue = latest.value;
+
+      // Calculate percentage change from 7-day average
+      const percentageChange =
+        ((currentValue - lastWeekAverage) / lastWeekAverage) * 100;
+
+      // Calculate granular trend: +3 to -3 based on percentage change
+      let trend;
+      let trendDescription;
+      if (percentageChange >= 15) {
+        trend = 3;
+        trendDescription = "Sentiment is rising strongly";
+      } else if (percentageChange >= 8) {
+        trend = 2;
+        trendDescription = "Sentiment is rising";
+      } else if (percentageChange >= 3) {
+        trend = 1;
+        trendDescription = "Sentiment is rising slightly";
+      } else if (percentageChange >= -3) {
+        trend = 0;
+        trendDescription = "Sentiment is stable";
+      } else if (percentageChange >= -8) {
+        trend = -1;
+        trendDescription = "Sentiment is falling slightly";
+      } else if (percentageChange >= -15) {
+        trend = -2;
+        trendDescription = "Sentiment is falling";
+      } else {
+        trend = -3;
+        trendDescription = "Sentiment is falling strongly";
+      }
+
+      console.log("📊 Trend Calculation:");
+      console.log("   Current Value:", currentValue);
+      console.log("   Last Week Average:", lastWeekAverage.toFixed(2));
+      console.log("   Percentage Change:", percentageChange.toFixed(2) + "%");
+      console.log("   Trend:", trend);
 
       res.json({
         timestamp: latest.timestamp,
         value: latest.value,
         classification: latest.value_classification,
+        trend: trend, // Calculated trend based on last week's average
+        trendDescription: trendDescription, // Human-readable trend description
+        label:
+          latest.value_classification === "Bearish"
+            ? "Bearish"
+            : latest.value_classification === "Slightly Bearish"
+            ? "Slightly Bearish"
+            : latest.value_classification === "Neutral"
+            ? "Neutral"
+            : latest.value_classification === "Slightly Bullish"
+            ? "Slightly Bullish"
+            : latest.value_classification === "Bullish"
+            ? "Bullish"
+            : "Unknown",
+        trendDetails: {
+          currentValue: currentValue,
+          lastWeekAverage: parseFloat(lastWeekAverage.toFixed(2)),
+          change: parseFloat((currentValue - lastWeekAverage).toFixed(2)),
+          percentageChange: parseFloat(
+            (
+              ((currentValue - lastWeekAverage) / lastWeekAverage) *
+              100
+            ).toFixed(2)
+          ),
+        },
       });
     } catch (error) {
       console.error("💥 Fear and Greed Index API Error Details:");
