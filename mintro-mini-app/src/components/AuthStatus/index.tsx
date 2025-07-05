@@ -1,36 +1,54 @@
 "use client";
 
-import { usePrivy } from "@privy-io/react-auth";
+import { useSession, signOut } from "next-auth/react";
 import { Button } from "@worldcoin/mini-apps-ui-kit-react";
 import { useMiniKit } from "@worldcoin/minikit-js/minikit-provider";
 
 export const AuthStatus = () => {
-  const { authenticated, user, login, logout } = usePrivy();
+  const { data: session, status } = useSession();
   const { isInstalled } = useMiniKit();
 
   // Debug environment variables
   console.log("Environment Debug:", {
     NEXT_PUBLIC_WLD_CLIENT_ID: process.env.NEXT_PUBLIC_WLD_CLIENT_ID,
-    NEXT_PUBLIC_PRIVY_APP_ID: process.env.NEXT_PUBLIC_PRIVY_APP_ID,
     isInstalled,
-    authenticated,
+    sessionStatus: status,
+    hasSession: !!session,
   });
 
-  if (authenticated) {
+  if (status === "loading") {
+    return (
+      <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
+        <h3 className="text-lg font-semibold text-blue-800 mb-2">
+          🔍 Loading...
+        </h3>
+        <p className="text-sm text-blue-700">
+          Checking authentication status...
+        </p>
+      </div>
+    );
+  }
+
+  if (session) {
     return (
       <div className="p-4 bg-green-50 border border-green-200 rounded-lg">
         <h3 className="text-lg font-semibold text-green-800 mb-2">
-          ✅ Authenticated with Privy
+          ✅ Authenticated with World App Wallet
         </h3>
         <div className="space-y-2 text-sm text-green-700">
           <div>
-            <strong>User ID:</strong> {user?.id}
+            <strong>Username:</strong> {session.user.username}
           </div>
           <div>
-            <strong>Wallet Address:</strong> {user?.wallet?.address}
+            <strong>Wallet Address:</strong> {session.user.walletAddress}
           </div>
         </div>
-        <Button onClick={logout} size="sm" variant="secondary" className="mt-3">
+        <Button
+          onClick={() => signOut({ callbackUrl: "/" })}
+          size="sm"
+          variant="secondary"
+          className="mt-3"
+        >
           Logout
         </Button>
       </div>
@@ -43,11 +61,8 @@ export const AuthStatus = () => {
         ⚠️ Not Authenticated
       </h3>
       <p className="text-sm text-yellow-700 mb-3">
-        Please log in using the button below to access the app.
+        Please log in using the World App wallet to access the app.
       </p>
-      <Button onClick={login} size="sm" variant="primary">
-        Login with Privy
-      </Button>
     </div>
   );
 };

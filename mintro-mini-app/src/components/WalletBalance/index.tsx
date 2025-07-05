@@ -1,6 +1,6 @@
 "use client";
 
-import { usePrivy } from "@privy-io/react-auth";
+import { useSession } from "next-auth/react";
 import { useMiniKit } from "@worldcoin/minikit-js/minikit-provider";
 import { useEffect, useState } from "react";
 import { createPublicClient, http, formatEther } from "viem";
@@ -13,7 +13,7 @@ interface TokenBalance {
 }
 
 export const WalletBalance = () => {
-  const { user, authenticated } = usePrivy();
+  const { data: session, status } = useSession();
   const { isInstalled } = useMiniKit();
   const [balances, setBalances] = useState<TokenBalance[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -27,7 +27,7 @@ export const WalletBalance = () => {
 
   useEffect(() => {
     const fetchBalances = async () => {
-      if (!authenticated || !user?.wallet?.address || !isInstalled) {
+      if (!session?.user?.walletAddress || !isInstalled) {
         return;
       }
 
@@ -35,7 +35,7 @@ export const WalletBalance = () => {
       setError(null);
 
       try {
-        const address = user.wallet.address as `0x${string}`;
+        const address = session.user.walletAddress as `0x${string}`;
 
         // Get native token balance (WLD)
         const nativeBalance = await client.getBalance({ address });
@@ -56,9 +56,17 @@ export const WalletBalance = () => {
     };
 
     fetchBalances();
-  }, [authenticated, user?.wallet?.address, isInstalled, client]);
+  }, [session?.user?.walletAddress, isInstalled, client]);
 
-  if (!authenticated) {
+  if (status === "loading") {
+    return (
+      <div className="p-4 bg-gray-100 rounded-lg">
+        <p className="text-gray-600">Loading wallet information...</p>
+      </div>
+    );
+  }
+
+  if (!session) {
     return (
       <div className="p-4 bg-gray-100 rounded-lg">
         <p className="text-gray-600">

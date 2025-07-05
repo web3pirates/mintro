@@ -1,17 +1,15 @@
 "use client";
 
 import { Button } from "@worldcoin/mini-apps-ui-kit-react";
-import { usePrivy } from "@privy-io/react-auth";
+import { signOut } from "next-auth/react";
 import { useRouter } from "next/navigation";
 
 export const LogoutButton = () => {
-  const { logout } = usePrivy();
   const router = useRouter();
 
   const handleLogout = async () => {
     try {
-      await logout();
-      router.push("/");
+      await signOut({ callbackUrl: "/" });
     } catch (error) {
       console.error("Logout error:", error);
     }

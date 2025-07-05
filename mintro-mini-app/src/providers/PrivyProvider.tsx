@@ -12,7 +12,8 @@ export const PrivyProvider = ({ children }: PrivyProviderProps) => {
     <PrivyProviderBase
       appId={process.env.NEXT_PUBLIC_PRIVY_APP_ID || ""}
       config={{
-        loginMethods: ["wallet"],
+        // Remove wallet login methods since we're using Worldcoin app's native wallet
+        loginMethods: [],
         appearance: {
           theme: "light",
           accentColor: "#676FFF",
