@@ -25,18 +25,14 @@ const SUI = web3.utils.toChecksumAddress(process.env.SUI_ADDRESS);
 
 // === Investment structure ===
 
-// Institutional (70%)
 const institutionalTokens = {
-  [BTC]: 40, // BTC
-  [SOL]: 30, // SOL
-  [WLD]: 30, // WLD
+  [BTC]: 57,
+  [WLD]: 43,
 };
 
-// Memecoin (30%)
 const memecoinTokens = {
-  [XRP]: 50, // XRP
-  [DOGE]: 30, // DOGE
-  [SUI]: 20, // SUI
+  [XRP]: 71,
+  [SUI]: 29,
 };
 
 // Router config
@@ -73,7 +69,7 @@ const ERC20_ABI = [
 ];
 
 // ============ TRADE FUNCTION ============
-async function tradeUSDCtoToken(tokenAddress, amountInUSDC) {
+async function tradeUSDCtoToken(tokenAddress, amountInUSDC, nonce) {
   const deadline = Math.floor(Date.now() / 1000) + 60 * 10;
   const amountIn = web3.utils.toWei(amountInUSDC.toString(), "mwei"); // USDC has 6 decimals
   const path = [USDC, tokenAddress];
@@ -89,8 +85,11 @@ async function tradeUSDCtoToken(tokenAddress, amountInUSDC) {
     const gasApprove = await approveTx.estimateGas({ from: account.address });
     const gasPrice = await web3.eth.getGasPrice();
 
-    const approveReceipt = await approveTx.send({ from: account.address, gas: gasApprove, gasPrice });
+    // Qui anche mettiamo nonce per la tx di approve
+    const approveReceipt = await approveTx.send({ from: account.address, gas: gasApprove, gasPrice, nonce });
     console.log(`✅ Approval tx hash: ${approveReceipt.transactionHash}`);
+
+    nonce++; // incrementa nonce per la tx successiva
   } else {
     console.log("Router already approved to spend sufficient USDC.");
   }
@@ -107,7 +106,7 @@ async function tradeUSDCtoToken(tokenAddress, amountInUSDC) {
   const gas = await tx.estimateGas({ from: account.address });
   const gasPrice = await web3.eth.getGasPrice();
 
-  const receipt = await tx.send({ from: account.address, gas, gasPrice });
+  const receipt = await tx.send({ from: account.address, gas, gasPrice, nonce });
 
   console.log(`✅ Traded ${amountInUSDC} USDC → ${tokenAddress} | Tx: ${receipt.transactionHash}`);
 
@@ -117,6 +116,8 @@ async function tradeUSDCtoToken(tokenAddress, amountInUSDC) {
     tx_hash: receipt.transactionHash,
     timestamp: new Date(),
   });
+
+  return Number(nonce) + 1;
 }
 
 // ============ EXECUTE FOR CATEGORY ============
@@ -124,10 +125,13 @@ async function executeCategory(name, totalAmount, tokenMap) {
   console.log(`🪙 Executing ${name.toUpperCase()} DCA...`);
   const totalPerc = Object.values(tokenMap).reduce((sum, p) => sum + p, 0);
 
+  // Recupero nonce iniziale
+  let nonce = await web3.eth.getTransactionCount(account.address, 'pending');
+
   for (const [token, perc] of Object.entries(tokenMap)) {
     const share = perc / totalPerc;
     const amount = totalAmount * share;
-    await tradeUSDCtoToken(token, amount);
+    nonce = await tradeUSDCtoToken(token, amount, nonce);
   }
 }
 
