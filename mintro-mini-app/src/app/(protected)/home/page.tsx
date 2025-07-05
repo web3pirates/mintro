@@ -22,7 +22,7 @@ export default function ProtectedHome() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           address: user.address,
-          redirectUrl: window.location.href,
+          amountUsd: "100", // Optional: you can make this configurable
         }),
       });
       const { url } = await response.json();

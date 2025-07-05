@@ -21,6 +21,24 @@ This template is a way for you to quickly get started with authentication and ex
 9. Continue to developer.worldcoin.org and make sure your app is connected to the right ngrok url
 10. [Optional] For Verify and Send Transaction to work you need to do some more setup in the dev portal. The steps are outlined in the respective component files.
 
+## Add Money Quick Action
+
+This mini app now uses the World App's Add Money Quick Action instead of Coinbase Onramp. The "Fund Wallet" button will open the World App's bridge interface where users can:
+
+- Add money to their World Wallet directly from exchanges like Binance and Coinbase
+- Deposit, withdraw, and swap tokens across multiple exchanges and chains
+- Support for USDC and WLD tokens
+
+The integration uses the following parameters:
+
+- `app_id`: Your World App mini app ID
+- `path`: URL-encoded path to the bridge interface (`%2Fbridge`)
+- `toAddress`: The user's World Wallet address
+- `toToken`: Token contract address (WLD: `0x16345785d8a0000`)
+- `sourceAppId`: Your app ID for navigation back
+- `sourceAppName`: "Mintro" (your app name)
+- `sourceDeeplinkPath`: URL-encoded path back to your app (`%2Fhome`)
+
 ### Environment Variables
 
 Create a `.env.local` file with the following variables:

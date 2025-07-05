@@ -21,7 +21,6 @@
     "clsx": "^2.1.1",
     "ethers": "^6.15.0",
     "iconoir-react": "^7.11.0",
-    "jsonwebtoken": "^9.0.2",
     "next": "15.2.3",
     "next-auth": "^5.0.0-beta.25",
     "react": "^19.0.0",
