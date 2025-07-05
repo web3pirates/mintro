@@ -10,28 +10,28 @@ import { UserInfo } from "@/components/UserInfo";
 // import { WalletBalance } from "@/components/WalletBalance";
 import { Marble, TopBar } from "@worldcoin/mini-apps-ui-kit-react";
 import { AuthButton } from "@/components/AuthButton";
-// import { useCallback } from "react";
+import { useCallback } from "react";
 
 export default function Home() {
   const { user, isLoading, isAuthenticated } = useWorldcoinAuth();
 
-  // const fundWallet = useCallback(async () => {
-  //   if (!user?.address) return;
-  //   try {
-  //     const response = await fetch("/api/onramp", {
-  //       method: "POST",
-  //       headers: { "Content-Type": "application/json" },
-  //       body: JSON.stringify({
-  //         address: user.address,
-  //         redirectUrl: window.location.href,
-  //       }),
-  //     });
-  //     const { url } = await response.json();
-  //     window.open(url, "_blank");
-  //   } catch (e) {
-  //     console.error(e);
-  //   }
-  // }, [user]);
+  const fundWallet = useCallback(async () => {
+    if (!user?.address) return;
+    try {
+      const response = await fetch("/api/onramp", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          address: user.address,
+          redirectUrl: window.location.href,
+        }),
+      });
+      const { url } = await response.json();
+      window.open(url, "_blank");
+    } catch (e) {
+      console.error(e);
+    }
+  }, [user]);
 
   if (isLoading) {
     return (
@@ -76,18 +76,13 @@ export default function Home() {
       </Page.Header>
       <Page.Main className="flex flex-col items-center justify-start gap-4 mb-16">
         <UserInfo />
-        {/* <button
+        <button
           onClick={fundWallet}
           className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 mb-2"
         >
           Fund Wallet
         </button>
-        <button
-          onClick={fundWallet}
-          className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 mb-2"
-        >
-          Ramp Up Funds
-        </button> */}
+
         {/* <UserInfo /> */}
         {/* <WalletBalance /> */}
         {/* <Verify /> */}
