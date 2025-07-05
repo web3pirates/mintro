@@ -37,6 +37,8 @@ export const DebugInfo = () => {
     minikitJs: string;
     minikitReact: string;
   }>({ minikitJs: "loading...", minikitReact: "loading..." });
+  const [wldBalance, setWldBalance] = useState<string | null>(null);
+  const [balanceError, setBalanceError] = useState<string | null>(null);
   const isMountedRef = useRef(false);
 
   const copyToClipboard = async () => {
@@ -64,6 +66,49 @@ export const DebugInfo = () => {
     setPackageVersions(getPackageVersions());
   }, []);
 
+  // Fetch WLD balance
+  useEffect(() => {
+    async function fetchWldBalance() {
+      if (!user?.address) return;
+
+      try {
+        const rpcUrl = process.env.NEXT_PUBLIC_RPC_URL;
+        if (!rpcUrl) {
+          setBalanceError(
+            "NEXT_PUBLIC_RPC_URL environment variable is not set"
+          );
+          return;
+        }
+
+        const { ethers } = await import("ethers");
+        const WLD_CONTRACT = "0x163f8C2467924be0ae7B5347228C0F3Fc0cC008e";
+        const ERC20_ABI = [
+          "function balanceOf(address owner) view returns (uint256)",
+          "function decimals() view returns (uint8)",
+        ];
+
+        const provider = new ethers.JsonRpcProvider(rpcUrl);
+        const contract = new ethers.Contract(WLD_CONTRACT, ERC20_ABI, provider);
+
+        const [rawBalance, decimals] = await Promise.all([
+          contract.balanceOf(user.address),
+          contract.decimals(),
+        ]);
+
+        const formattedBalance = ethers.formatUnits(rawBalance, decimals);
+        setWldBalance(formattedBalance);
+        setBalanceError(null);
+      } catch (error) {
+        const errorMessage =
+          error instanceof Error ? error.message : "Unknown error";
+        setBalanceError(errorMessage);
+        setWldBalance(null);
+      }
+    }
+
+    fetchWldBalance();
+  }, [user?.address]);
+
   // Set mounted ref
   useEffect(() => {
     isMountedRef.current = true;
@@ -88,6 +133,13 @@ export const DebugInfo = () => {
         isInstalled,
         versions: packageVersions,
       },
+      wldBalance: {
+        balance: wldBalance,
+        error: balanceError,
+        contractAddress: "0x163f8C2467924be0ae7B5347228C0F3Fc0cC008e",
+        network: "World Chain",
+        rpcUrl: maskSensitiveData(process.env.NEXT_PUBLIC_RPC_URL),
+      },
       environment: {
         WLD_CLIENT_ID: maskSensitiveData(process.env.NEXT_PUBLIC_WLD_CLIENT_ID),
         NODE_ENV: process.env.NODE_ENV,
@@ -101,7 +153,15 @@ export const DebugInfo = () => {
 
     setDebugInfo(info);
     console.log("Debug Info:", info);
-  }, [isLoading, isAuthenticated, user, isInstalled, packageVersions]);
+  }, [
+    isLoading,
+    isAuthenticated,
+    user,
+    isInstalled,
+    packageVersions,
+    wldBalance,
+    balanceError,
+  ]);
 
   // Capture console errors
   useEffect(() => {

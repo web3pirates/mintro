@@ -101,7 +101,6 @@ export const MintroBranding = () => {
   const [isClient, setIsClient] = useState(false);
   const [wldBalance, setWldBalance] = useState<string | null>(null);
   const [balanceError, setBalanceError] = useState<string | null>(null);
-  const [debugLogs, setDebugLogs] = useState<string[]>([]);
 
   useEffect(() => {
     setIsClient(true);
@@ -117,15 +116,12 @@ export const MintroBranding = () => {
   useEffect(() => {
     async function fetchWldBalance() {
       if (!user?.address) {
-        setDebugLogs((prev) => [...prev, "No user address available"]);
+        console.log("No user address available");
         return;
       }
 
       try {
-        setDebugLogs((prev) => [
-          ...prev,
-          `Fetching WLD balance for address: ${user.address}`,
-        ]);
+        console.log("Fetching WLD balance for address:", user.address);
 
         // Check if RPC URL is available
         const rpcUrl = process.env.NEXT_PUBLIC_RPC_URL;
@@ -135,43 +131,31 @@ export const MintroBranding = () => {
           );
         }
 
-        setDebugLogs((prev) => [...prev, `Using RPC URL: ${rpcUrl}`]);
-        setDebugLogs((prev) => [
-          ...prev,
-          `Network: World Chain (Worldcoin's blockchain)`,
-        ]);
+        console.log("Using RPC URL:", rpcUrl);
+        console.log("Network: World Chain (Worldcoin's blockchain)");
 
         const provider = new ethers.JsonRpcProvider(rpcUrl);
         const contract = new ethers.Contract(WLD_CONTRACT, ERC20_ABI, provider);
 
-        setDebugLogs((prev) => [...prev, `Contract address: ${WLD_CONTRACT}`]);
+        console.log("Contract address:", WLD_CONTRACT);
 
         const [rawBalance, decimals] = await Promise.all([
           contract.balanceOf(user.address),
           contract.decimals(),
         ]);
 
-        setDebugLogs((prev) => [
-          ...prev,
-          `Raw balance: ${rawBalance.toString()}`,
-        ]);
-        setDebugLogs((prev) => [...prev, `Decimals: ${decimals}`]);
+        console.log("Raw balance:", rawBalance.toString());
+        console.log("Decimals:", decimals);
 
         const formattedBalance = ethers.formatUnits(rawBalance, decimals);
-        setDebugLogs((prev) => [
-          ...prev,
-          `Formatted balance: ${formattedBalance}`,
-        ]);
+        console.log("Formatted balance:", formattedBalance);
 
         setWldBalance(formattedBalance);
         setBalanceError(null);
       } catch (error) {
         const errorMessage =
           error instanceof Error ? error.message : "Unknown error";
-        setDebugLogs((prev) => [
-          ...prev,
-          `Error fetching WLD balance: ${errorMessage}`,
-        ]);
+        console.error("Error fetching WLD balance:", errorMessage);
         setBalanceError(errorMessage);
         setWldBalance(null);
       }
@@ -189,7 +173,7 @@ export const MintroBranding = () => {
             Mintro
           </h1>
           <h3 className="text-lg font-semibold">
-            Your intelligent DeFi companion v0.11
+            Your intelligent DeFi companion v0.12
           </h3>
         </div>
       </div>
@@ -266,23 +250,6 @@ export const MintroBranding = () => {
             <div className="text-white text-sm">
               <strong>User Address:</strong> {user?.address}
             </div>
-
-            {/* Debug Info Section */}
-            {debugLogs.length > 0 && (
-              <div className="mt-6 p-4 bg-gray-800 rounded-lg">
-                <h3 className="text-white font-semibold mb-2">Debug Info:</h3>
-                <div className="space-y-1">
-                  {debugLogs.map((log, index) => (
-                    <div
-                      key={index}
-                      className="text-green-400 text-xs font-mono"
-                    >
-                      {log}
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
           </div>
         ) : (
           <div className="space-y-4">
