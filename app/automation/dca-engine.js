@@ -139,3 +139,7 @@ console.log("🚀 DCA bot is running...");
 
 // Run immediately for test
 executeDCA().catch(console.error);
+
+module.exports = {
+  executeDCA
+};
