@@ -5,10 +5,10 @@ export async function POST(req: NextRequest) {
 
   const baseUrl = "https://pay.coinbase.com/buy";
   const params = new URLSearchParams({
-    appId: process.env.COINBASE_ONRAMP_PUBLIC_KEY!,
-    destinationWallets: JSON.stringify([
-      { address, blockchains: ["ethereum"] },
-    ]),
+    appId: process.env.COINBASE_ONRAMP_APP_ID!, // Updated env var name
+    // New Coinbase Onramp parameters
+    addresses: JSON.stringify({ worldchain: address }),
+    assets: JSON.stringify(["WLD"]),
     redirectUrl,
   });
 

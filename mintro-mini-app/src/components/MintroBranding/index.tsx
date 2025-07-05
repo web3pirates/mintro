@@ -3,7 +3,7 @@
 import { useWorldcoinAuth } from "@/hooks/useWorldcoinAuth";
 import { Button } from "@worldcoin/mini-apps-ui-kit-react";
 import { useState, useEffect } from "react";
-import { ethers } from "ethers";
+// Removed: import { ethers } from "ethers";
 
 interface SwapNotification {
   id: string;
@@ -87,20 +87,12 @@ const getTypeIcon = (type: string) => {
   }
 };
 
-const WLD_CONTRACT = "0x163f8C2467924be0ae7B5347228C0F3Fc0cC008e"; // WLD token contract on World Chain - needs checksum
-const ERC20_ABI = [
-  "function balanceOf(address owner) view returns (uint256)",
-  "function decimals() view returns (uint8)",
-];
-
 export const MintroBranding = () => {
   const { isLoading, isAuthenticated, user } = useWorldcoinAuth();
   const [formattedNotifications, setFormattedNotifications] = useState<
     SwapNotification[]
   >([]);
   const [isClient, setIsClient] = useState(false);
-  const [wldBalance, setWldBalance] = useState<string | null>(null);
-  const [balanceError, setBalanceError] = useState<string | null>(null);
 
   useEffect(() => {
     setIsClient(true);
@@ -113,62 +105,6 @@ export const MintroBranding = () => {
     setFormattedNotifications(formatted);
   }, []);
 
-  useEffect(() => {
-    async function fetchWldBalance() {
-      if (!user?.address) {
-        console.log("No user address available");
-        return;
-      }
-
-      try {
-        console.log("Fetching WLD balance for address:", user.address);
-
-        // Check if RPC URL is available
-        const rpcUrl = process.env.NEXT_PUBLIC_RPC_URL;
-        if (!rpcUrl) {
-          throw new Error(
-            "NEXT_PUBLIC_RPC_URL environment variable is not set"
-          );
-        }
-
-        console.log("Using RPC URL:", rpcUrl);
-        console.log("Network: World Chain (Worldcoin's blockchain)");
-
-        const provider = new ethers.JsonRpcProvider(rpcUrl);
-        const checksummedAddress = ethers.getAddress(WLD_CONTRACT);
-        console.log("Contract address:", WLD_CONTRACT);
-        console.log("Checksummed address:", checksummedAddress);
-        const contract = new ethers.Contract(
-          checksummedAddress,
-          ERC20_ABI,
-          provider
-        );
-
-        const [rawBalance, decimals] = await Promise.all([
-          contract.balanceOf(user.address),
-          contract.decimals(),
-        ]);
-
-        console.log("Raw balance:", rawBalance.toString());
-        console.log("Decimals:", decimals);
-
-        const formattedBalance = ethers.formatUnits(rawBalance, decimals);
-        console.log("Formatted balance:", formattedBalance);
-
-        setWldBalance(formattedBalance);
-        setBalanceError(null);
-      } catch (error) {
-        const errorMessage =
-          error instanceof Error ? error.message : "Unknown error";
-        console.error("Error fetching WLD balance:", errorMessage);
-        setBalanceError(errorMessage);
-        setWldBalance(null);
-      }
-    }
-
-    fetchWldBalance();
-  }, [user?.address]);
-
   return (
     <div className="max-w-4xl mx-auto space-y-8">
       {/* Hero Section */}
@@ -178,7 +114,7 @@ export const MintroBranding = () => {
             Mintro
           </h1>
           <h3 className="text-lg font-semibold">
-            Your intelligent DeFi companion v0.15
+            Your intelligent DeFi companion v0.17
           </h3>
         </div>
       </div>
@@ -242,16 +178,6 @@ export const MintroBranding = () => {
           </div>
         ) : isAuthenticated ? (
           <div className="space-y-4">
-            {wldBalance !== null && (
-              <div className="text-white">
-                <strong>WLD Balance:</strong> {wldBalance}
-              </div>
-            )}
-            {balanceError && (
-              <div className="text-red-400 text-sm">
-                <strong>Error fetching balance:</strong> {balanceError}
-              </div>
-            )}
             <div className="text-white text-sm">
               <strong>User Address:</strong> {user?.address}
             </div>
