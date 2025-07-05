@@ -45,7 +45,7 @@ app.get("/health", (req, res) => {
 // Root endpoint
 app.get("/", (req, res) => {
   res.json({
-    message: "Senti Backend API",
+    message: "Mintro Sentiment Backend API",
     version: "1.0.0",
     endpoints: {
       health: "/health",
