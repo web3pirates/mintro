@@ -12,6 +12,12 @@ interface ConsoleError {
   stack?: string;
 }
 
+// Function to mask sensitive data
+const maskSensitiveData = (value: string | null | undefined): string => {
+  if (!value || value.length <= 4) return value || "";
+  return "*".repeat(value.length - 4) + value.slice(-4);
+};
+
 export const DebugInfo = () => {
   const { user, authenticated, ready } = usePrivy();
   const { isInstalled } = useMiniKit();
@@ -47,8 +53,8 @@ export const DebugInfo = () => {
         authenticated,
         user: user
           ? {
-              id: user.id,
-              walletAddress: user.wallet?.address,
+              id: maskSensitiveData(user.id),
+              walletAddress: maskSensitiveData(user.wallet?.address),
               linkedAccounts: user.linkedAccounts?.length || 0,
             }
           : null,
@@ -57,8 +63,8 @@ export const DebugInfo = () => {
         isInstalled,
       },
       environment: {
-        WLD_CLIENT_ID: process.env.NEXT_PUBLIC_WLD_CLIENT_ID,
-        PRIVY_APP_ID: process.env.NEXT_PUBLIC_PRIVY_APP_ID,
+        WLD_CLIENT_ID: maskSensitiveData(process.env.NEXT_PUBLIC_WLD_CLIENT_ID),
+        PRIVY_APP_ID: maskSensitiveData(process.env.NEXT_PUBLIC_PRIVY_APP_ID),
         NODE_ENV: process.env.NODE_ENV,
       },
       window: {
