@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { executeDCA } = require('../dca-engine');
+const { executeDCA } = require('../app/automation/dca-engine');
 
 router.post('/execute', auth, async (req, res) => {
   try {
