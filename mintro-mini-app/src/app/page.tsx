@@ -8,13 +8,24 @@ import { Navigation } from "../components/Navigation";
 import { MintroBranding } from "@/components/MintroBranding";
 import AdjustPortfolioPage from "../components/AdjustPortfolioPage";
 import InvestAmountPage from "../components/InvestAmountPage";
+import ConfirmPlanPage from "@/components/ConfirmPlanPage";
 
 export default function Home() {
-  const [screen, setScreen] = useState<"main" | "adjust" | "invest">("main");
+  const [screen, setScreen] = useState<"main" | "adjust" | "invest" | "confirm">("main");
+  const [allocations, setAllocations] = useState<number[]>([30, 40, 30]);
+  const [amount, setAmount] = useState<string>("50");
+  const [frequency, setFrequency] = useState<string>("Weekly");
 
   if (screen === "invest") {
     return (
-      <InvestAmountPage onBack={() => setScreen("adjust") } onNext={() => alert("Next step!")} />
+      <InvestAmountPage 
+        onBack={() => setScreen("adjust")} 
+        onNext={() => setScreen("confirm")}
+        amount={amount}
+        frequency={frequency}
+        onAmountChange={setAmount}
+        onFrequencyChange={setFrequency}
+      />
     );
   }
 
@@ -29,9 +40,22 @@ export default function Home() {
             hideBackButton
             onSkip={() => setScreen("invest")}
             onConfirm={() => setScreen("invest")}
+            allocations={allocations}
+            onAllocationsChange={setAllocations}
           />
         </div>
       </div>
+    );
+  }
+
+  if (screen === "confirm") {
+    return (
+      <ConfirmPlanPage 
+        onBack={() => setScreen("invest")} 
+        allocations={allocations} 
+        amount={amount} 
+        frequency={frequency} 
+      />
     );
   }
 

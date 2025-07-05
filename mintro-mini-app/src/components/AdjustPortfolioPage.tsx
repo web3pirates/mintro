@@ -119,8 +119,19 @@ function FooterButtons({ onSkip, onConfirm, disabled }: any) {
   );
 }
 
-export default function AdjustPortfolioPage({ hideBackButton, onSkip, onConfirm }: { hideBackButton?: boolean, onSkip?: () => void, onConfirm?: () => void }) {
-  const [allocations, setAllocations] = useState([30, 40, 30]);
+export default function AdjustPortfolioPage({ 
+  hideBackButton, 
+  onSkip, 
+  onConfirm, 
+  allocations, 
+  onAllocationsChange 
+}: { 
+  hideBackButton?: boolean, 
+  onSkip?: () => void, 
+  onConfirm?: () => void,
+  allocations: number[],
+  onAllocationsChange: (allocations: number[]) => void
+}) {
   const total = allocations.reduce((a, b) => a + b, 0);
   const hasError = total !== 100;
 
@@ -134,7 +145,7 @@ export default function AdjustPortfolioPage({ hideBackButton, onSkip, onConfirm 
       <div className="w-full max-w-md mx-auto">
         <div className="text-2xl font-extrabold text-black">Adjust your portfolio</div>
         <div className="text-xl font-bold text-gray-400 mb-6">(Optional)</div>
-        <PortfolioSliderCard allocations={allocations} setAllocations={setAllocations} />
+        <PortfolioSliderCard allocations={allocations} setAllocations={onAllocationsChange} />
         <ErrorMessage show={hasError} />
       </div>
       <FooterButtons onSkip={onSkip} onConfirm={onConfirm} disabled={hasError} />

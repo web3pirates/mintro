@@ -62,10 +62,21 @@ function SummaryText({ amount, frequency }: { amount: string; frequency: string 
   );
 }
 
-export default function InvestAmountPage({ onBack, onNext }: { onBack?: () => void; onNext?: () => void }) {
-  const [amount, setAmount] = useState("50");
-  const [frequency, setFrequency] = useState("Weekly");
-
+export default function InvestAmountPage({ 
+  onBack, 
+  onNext, 
+  amount, 
+  frequency, 
+  onAmountChange, 
+  onFrequencyChange 
+}: { 
+  onBack?: () => void; 
+  onNext?: () => void;
+  amount: string;
+  frequency: string;
+  onAmountChange: (amount: string) => void;
+  onFrequencyChange: (frequency: string) => void;
+}) {
   return (
     <div className="min-h-screen bg-white flex flex-col relative px-4 pb-8">
       <button className="absolute left-4 top-6 text-2xl z-10" onClick={onBack}>
@@ -74,12 +85,12 @@ export default function InvestAmountPage({ onBack, onNext }: { onBack?: () => vo
       <div className="w-full max-w-md mx-auto pt-16 flex flex-col flex-1">
         <div className="mt-2 mb-6 flex flex-col gap-4">
           <div className="!text-2xl font-extrabold !text-black mb-2">How much do you want<br />to invest?</div>
-          <AmountInput value={amount} onChange={setAmount} />
-          <AmountPresetButtons value={amount} onChange={setAmount} />
+          <AmountInput value={amount} onChange={onAmountChange} />
+          <AmountPresetButtons value={amount} onChange={onAmountChange} />
         </div>
         <div className="mb-2">
           <div className="!text-2xl !font-extrabold !text-black mb-2">How often should it recur?</div>
-          <FrequencyButtons value={frequency} onChange={setFrequency} />
+          <FrequencyButtons value={frequency} onChange={onFrequencyChange} />
         </div>
         <SummaryText amount={amount} frequency={frequency} />
         <button
