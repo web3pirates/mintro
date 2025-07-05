@@ -13,12 +13,8 @@ export default function Home() {
         {/* Authentication Section */}
         <div className="max-w-2xl mx-auto w-full space-y-6">
           <div className="text-center">
-            <h2 className="text-2xl font-bold text-gray-800 mb-2">
-              Get Started
-            </h2>
-            <p className="text-gray-600">
-              Connect your wallet to access Mintro&apos;s features
-            </p>
+            <h2 className="text-2xl font-bold text-white mb-2">Get Started</h2>
+            <p className="text-white">Connect your wallet to start trading</p>
           </div>
           <AuthStatus />
           <div className="flex justify-center">

@@ -91,70 +91,17 @@ export const MintroBranding = () => {
       {/* Hero Section */}
       <div className="text-center space-y-6">
         <div className="space-y-4">
-          <h1 className="text-4xl md:text-6xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+          <h1 className="text-4xl md:text-6xl bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
             Mintro
           </h1>
-          <p className="text-xl md:text-2xl text-gray-700 max-w-3xl mx-auto">
-            Your intelligent DeFi companion. Discover, track, and optimize your
-            crypto investments with AI-powered insights.
-          </p>
-        </div>
-
-        <div className="flex flex-wrap justify-center gap-4 text-sm text-gray-600">
-          <div className="flex items-center gap-2">
-            <span className="w-2 h-2 bg-green-500 rounded-full"></span>
-            Real-time Portfolio Tracking
-          </div>
-          <div className="flex items-center gap-2">
-            <span className="w-2 h-2 bg-blue-500 rounded-full"></span>
-            AI-Powered Yield Optimization
-          </div>
-          <div className="flex items-center gap-2">
-            <span className="w-2 h-2 bg-purple-500 rounded-full"></span>
-            Cross-Chain Analytics
-          </div>
-        </div>
-      </div>
-
-      {/* Features Grid */}
-      <div className="grid md:grid-cols-3 gap-6">
-        <div className="p-6 bg-white rounded-xl shadow-sm border border-gray-100">
-          <div className="text-3xl mb-4">📊</div>
-          <h3 className="text-lg font-semibold mb-2">Portfolio Analytics</h3>
-          <p className="text-gray-600">
-            Get comprehensive insights into your DeFi positions across multiple
-            protocols and chains.
-          </p>
-        </div>
-        <div className="p-6 bg-white rounded-xl shadow-sm border border-gray-100">
-          <div className="text-3xl mb-4">🤖</div>
-          <h3 className="text-lg font-semibold mb-2">AI Recommendations</h3>
-          <p className="text-gray-600">
-            Receive personalized suggestions for yield farming, liquidity
-            provision, and risk management.
-          </p>
-        </div>
-        <div className="p-6 bg-white rounded-xl shadow-sm border border-gray-100">
-          <div className="text-3xl mb-4">⚡</div>
-          <h3 className="text-lg font-semibold mb-2">Instant Notifications</h3>
-          <p className="text-gray-600">
-            Stay updated with real-time alerts on your transactions, yields, and
-            market opportunities.
+          <p className="text-xl md:text-2xl text-white max-w-3xl mx-auto">
+            Your intelligent DeFi companion.
           </p>
         </div>
       </div>
 
       {/* Timeline Section */}
       <div className="space-y-6">
-        <div className="text-center">
-          <h2 className="text-2xl font-bold text-gray-800 mb-2">
-            Recent Activity
-          </h2>
-          <p className="text-gray-600">
-            Your latest DeFi transactions and activities
-          </p>
-        </div>
-
         <div className="space-y-4">
           {mockSwapNotifications.map((notification) => (
             <div
@@ -205,13 +152,13 @@ export const MintroBranding = () => {
             <Button size="lg" variant="primary" className="px-8">
               🚀 Start Trading
             </Button>
-            <p className="text-sm text-gray-600">
+            <p className="text-sm text-white">
               Ready to optimize your DeFi strategy?
             </p>
           </div>
         ) : (
           <div className="space-y-4">
-            <p className="text-gray-600">
+            <p className="text-white">
               Connect your wallet to start tracking your DeFi portfolio
             </p>
           </div>
