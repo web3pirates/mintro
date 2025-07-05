@@ -103,15 +103,15 @@ const WalletDashboard = () => {
                 <ArrowDownToLine className="w-4 h-4" />
                 <span>Receive</span>
               </button>
-              <button className="bg-gray-200 hover:bg-gray-300 px-4 py-2 rounded-full flex items-center space-x-2 transition-colors" style={{color: 'rgb(17 24 39)'}}>
+              <button className="bg-gray-200 hover:bg-zinc-300 px-4 py-2 rounded-full flex items-center space-x-2 transition-colors" style={{color: 'rgb(17 24 39)'}}>
                 <Send className="w-4 h-4" />
                 <span>Send</span>
               </button>
-              <button className="bg-gray-200 hover:bg-gray-300 px-4 py-2 rounded-full flex items-center space-x-2 transition-colors" style={{color: 'rgb(17 24 39)'}}>
+              <button className="bg-gray-200 hover:bg-zinc-300 px-4 py-2 rounded-full flex items-center space-x-2 transition-colors" style={{color: 'rgb(17 24 39)'}}>
                 <ArrowUpDown className="w-4 h-4" />
                 <span>Swap</span>
               </button>
-              <button className="bg-gray-200 hover:bg-gray-300 px-4 py-2 rounded-full flex items-center space-x-2 transition-colors" style={{color: 'rgb(17 24 39)'}}>
+              <button className="bg-gray-200 hover:bg-zinc-300 px-4 py-2 rounded-full flex items-center space-x-2 transition-colors" style={{color: 'rgb(17 24 39)'}}>
                 <ShoppingCart className="w-4 h-4" />
                 <span>Buy</span>
               </button>
@@ -156,7 +156,7 @@ const WalletDashboard = () => {
               {tokens.map((token, index) => (
                 <div
                   key={index}
-                  className="grid grid-cols-12 gap-4 px-4 py-4 hover:bg-gray-900/50 rounded-lg transition-colors cursor-pointer"
+                  className="grid grid-cols-12 gap-4 px-4 py-4 hover:bg-zinc-300 rounded-lg transition-colors cursor-pointer"
                 >
                   {/* Token Info */}
                   <div className="col-span-3 flex items-center space-x-3">

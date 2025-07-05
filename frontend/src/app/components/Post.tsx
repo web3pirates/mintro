@@ -7,7 +7,7 @@ export default function Post() {
       {/* Post */}
       <div className="pb-4 mb-4">
         <div className="flex space-x-3">
-          <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{backgroundColor: 'rgb(180 180 184)'}}>
+          <div className="w-10 h-10 rounded-full flex items-center justify-center bg-zinc-300" >
             <span></span>
           </div>
           <div className="flex-1">

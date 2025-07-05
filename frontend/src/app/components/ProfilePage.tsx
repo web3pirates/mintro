@@ -39,7 +39,7 @@ export default function ProfilePage() {
       <div className="flex items-center justify-between p-4 ">
         <div className="flex items-center space-x-4">
          <div className="w-20 h-8  rounded-full flex items-center justify-center text-2xl font-bold" style={{color: 'rgb(17 24 39)'}}>
-            Mintro
+            Nudge
         </div>
 
           <div className="flex items-center space-x-2 bg-gray-100 rounded-full px-3 py-2 flex-1 max-w-md">
@@ -52,15 +52,13 @@ export default function ProfilePage() {
           </div>
         </div>
         <div className="flex items-center space-x-4">
-          <button className="flex items-center space-x-2 bg-gray-900 rounded-full px-4 py-2"style={{backgroundColor: 'rgb(17 24 39)'}}>
+         {/* <button className="flex items-center space-x-2 bg-gray-900 rounded-full px-4 py-2"style={{backgroundColor: 'rgb(17 24 39)'}}>
             <Edit className="w-4 h-4" />
             <span>Post Activity</span>
-          </button>
+          </button> */}
           <button className="flex items-center space-x-2 " style={{color: 'rgb(17 24 39)'}}>
-            <Gift className="w-4 h-4" />
-            <span>Invite & Earn</span>
           </button>
-          <div className="w-8 h-8  rounded-full"style={{backgroundColor: 'rgb(180 180 184)'}}></div>
+          <div className="w-8 h-8  rounded-full bg-zinc-300"></div>
         </div>
       </div>
 
@@ -83,14 +81,14 @@ export default function ProfilePage() {
           {/* Profile Header */}
           <div className="relative">
             {/* Cover Image */}
-            <div className="h-48 bg-gradient-to-r rounded-t-lg from-purple-400 via-pink-400 to-blue-400 relative">
+            <div className="h-48 bg-gradient-to-r from-violet-600 via-purple-400 to-emerald-300 rounded-t-lg relative">
               <div className="absolute inset-0 bg-gradient-to-b from-transparent to-black/20"></div>
             </div>
             
             {/* Profile Info */}
             <div className="px-6 pb-4">
               <div className="flex justify-between items-start -mt-16">
-                <div className="w-32 h-32 z-100 rounded-full flex items-center justify-center" style={{backgroundColor: 'rgb(180 180 184)'}}>
+                <div className="w-32 h-32 z-100 rounded-full flex items-center justify-center bg-zinc-300" >
                   <span className="text-4xl">👤</span>
                 </div>
                 <div className="flex space-x-2 mt-16">
@@ -147,9 +145,10 @@ export default function ProfilePage() {
 
 
         {/* Right Sidebar */}
-        <div className="w-80 p-8 space-y-6 " style={{color: 'rgb(17 24 39)'}}>
+        <div className="w-80 p-8 pt-5 space-y-6 " style={{color: 'rgb(17 24 39)'}}>
           {/* Recent Trades */}
           <div>
+            <h1 className="font-bold mb-5 text-3xl">Highlights:</h1>
             <h3 className="font-bold mb-3">Recent Trades</h3>
             <div className="space-y-3">
               {recentTrades.map((trade, index) => (
@@ -168,7 +167,7 @@ export default function ProfilePage() {
                       )}
                     </div>
                     <div>
-                      <div className="text-sm">{trade.action} 🪙{trade.token}</div>
+                      <div className="text-sm">{trade.action} 🪙 {trade.token}</div>
                       <div className="text-xs text-gray-400">{trade.time}</div>
                     </div>
                   </div>
@@ -187,9 +186,8 @@ export default function ProfilePage() {
               {copiedTrades.map((trade, index) => (
                 <div key={index} className="flex items-center justify-between">
                   <div className="flex items-center space-x-2">
-                    <div className="w-6 h-6 rounded-full"style={{backgroundColor: 'rgb(180 180 184)'}}></div>
                     <div>
-                      <div className="text-sm">{trade.user} {trade.action} 🪙{trade.token}</div>
+                      <div className="text-sm">{trade.user} {trade.action} 🪙 {trade.token}</div>
                       <div className="text-xs text-green-400">{trade.profit} {trade.percentage}</div>
                     </div>
                   </div>
@@ -197,7 +195,7 @@ export default function ProfilePage() {
                     <button className="p-1 hover:bg-gray-800 rounded">
                       <Copy className="w-3 h-3" />
                     </button>
-                    <div className="bg-blue-600 text-xs px-2 py-1 rounded-full">
+                    <div className="text-xs px-2 py-1 rounded-full">
                       {trade.copies}
                     </div>
                   </div>
