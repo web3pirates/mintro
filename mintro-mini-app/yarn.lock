@@ -2715,7 +2715,15 @@
     tailwind-merge "^2.5.5"
     vaul "^1.1.2"
 
-"@worldcoin/minikit-js@1.9.6", "@worldcoin/minikit-js@latest":
+"@worldcoin/minikit-js@1.9.5":
+  version "1.9.5"
+  resolved "https://registry.yarnpkg.com/@worldcoin/minikit-js/-/minikit-js-1.9.5.tgz#aa6ebd337cab17496abe10680a34691a5cee7718"
+  integrity sha512-pO2gy4OxBcZoFFkZlpKv1Ov73apoRa3UCTCnScFj20LHH8ByjFhcTDEi1rxYg5i9ljby2PfRpClSGeG/1wbtUg==
+  dependencies:
+    "@worldcoin/idkit-core" "^2.0.2"
+    abitype "^1.0.6"
+
+"@worldcoin/minikit-js@^1.9.6":
   version "1.9.6"
   resolved "https://registry.yarnpkg.com/@worldcoin/minikit-js/-/minikit-js-1.9.6.tgz#c653cf00bbbb6c9fe477e81956932aa4c6ebd797"
   integrity sha512-nKPj9hQngHV0bD4/SD/XZmNAYv/zfZjptPjnuzIWouRR8AQHFpdkCPIw03QujhBG+3kUwUpsBAgYPwEk4vj2dw==
@@ -2723,12 +2731,12 @@
     "@worldcoin/idkit-core" "^2.0.2"
     abitype "^1.0.6"
 
-"@worldcoin/minikit-react@latest":
-  version "1.9.7"
-  resolved "https://registry.yarnpkg.com/@worldcoin/minikit-react/-/minikit-react-1.9.7.tgz#4f1389143bd2199348efc9d519c8ce351d54e790"
-  integrity sha512-K/dp2VGPf4VvQwYPK8i4UzW+WuK2J+T70ZHWnF3JiiU7aql5n75d2LIpqEXCC43LFkmu54F7FIxQ+mNQ5Exryg==
+"@worldcoin/minikit-react@1.9.6":
+  version "1.9.6"
+  resolved "https://registry.yarnpkg.com/@worldcoin/minikit-react/-/minikit-react-1.9.6.tgz#badde1d17add5e53be636626b4c881ec5e6bbae9"
+  integrity sha512-hlXTYZ1RZayRTEgf8KziPBjPVFX7ucBBaLzLQrXafqrfzA7FxES/woH3nMNmcDW4sUbkdzPHaYYOAxS5yhuHxw==
   dependencies:
-    "@worldcoin/minikit-js" "1.9.6"
+    "@worldcoin/minikit-js" "1.9.5"
     abitype "^1.0.6"
     turbo "^2.3.3"
 
