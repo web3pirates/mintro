@@ -2,26 +2,15 @@
 
 import { usePrivy } from "@privy-io/react-auth";
 import { useMiniKit } from "@worldcoin/minikit-js/minikit-provider";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { Button } from "@worldcoin/mini-apps-ui-kit-react";
 
-// Function to get package versions dynamically
-const getPackageVersions = async () => {
-  try {
-    const response = await fetch("/package.json");
-    const packageJson = await response.json();
-    return {
-      minikitJs: packageJson.dependencies["@worldcoin/minikit-js"] || "unknown",
-      minikitReact:
-        packageJson.dependencies["@worldcoin/minikit-react"] || "unknown",
-    };
-  } catch (error) {
-    console.error("Failed to load package.json:", error);
-    return {
-      minikitJs: "unknown",
-      minikitReact: "unknown",
-    };
-  }
+// Function to get package versions - simplified to avoid fetch issues
+const getPackageVersions = () => {
+  return {
+    minikitJs: "unknown",
+    minikitReact: "unknown",
+  };
 };
 
 interface ConsoleError {
@@ -48,6 +37,7 @@ export const DebugInfo = () => {
     minikitJs: string;
     minikitReact: string;
   }>({ minikitJs: "loading...", minikitReact: "loading..." });
+  const isMountedRef = useRef(false);
 
   const copyToClipboard = async () => {
     try {
@@ -71,7 +61,15 @@ export const DebugInfo = () => {
 
   // Load package versions
   useEffect(() => {
-    getPackageVersions().then(setPackageVersions);
+    setPackageVersions(getPackageVersions());
+  }, []);
+
+  // Set mounted ref
+  useEffect(() => {
+    isMountedRef.current = true;
+    return () => {
+      isMountedRef.current = false;
+    };
   }, []);
 
   useEffect(() => {
@@ -127,7 +125,12 @@ export const DebugInfo = () => {
         stack: args.find((arg) => arg instanceof Error)?.stack,
       };
 
-      setConsoleErrors((prev) => [...prev, error]);
+      // Use setTimeout to defer state update and avoid render phase issues
+      setTimeout(() => {
+        if (isMountedRef.current) {
+          setConsoleErrors((prev) => [...prev, error]);
+        }
+      }, 0);
     };
 
     console.error = (...args) => {
@@ -162,7 +165,7 @@ export const DebugInfo = () => {
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <h3 className="text-lg font-semibold">Debug Information</h3>
-            {consoleErrors.length > 0 && (
+            {consoleErrors.length > 0 && isExpanded && (
               <span className="bg-red-500 text-white text-xs px-2 py-1 rounded-full">
                 {consoleErrors.length}
               </span>
