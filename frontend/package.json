@@ -9,12 +9,13 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@headlessui/react": "^2.2.4",
-    "lucide-react": "^0.525.0",
-    "next": "^15.3.5",
-    "react": "^19.1.0",
-    "react-dom": "^19.1.0",
-    "react-icons": "^5.5.0"
+    "alchemy-sdk": "^3.6.1",
+    "axios": "^1.10.0",
+    "dotenv": "^17.0.1",
+    "ethers": "^6.15.0",
+    "next": "15.3.5",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
