@@ -43,11 +43,8 @@ export default function Home() {
       </Page.Header>
       <Page.Main className="flex flex-col items-center justify-start gap-4 mb-16">
         <UserInfo />
-        dewfewfwe
         <WalletBalance />
-        dqwdwqdwq
         <Verify />
-        dwqdqw
         <Pay />
         <Transaction />
         <ViewPermissions />
