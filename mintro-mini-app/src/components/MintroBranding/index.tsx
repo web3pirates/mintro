@@ -113,7 +113,7 @@ export const MintroBranding = () => {
             Mintro
           </h1>
           <p className="text-xl md:text-2xl text-white max-w-3xl mx-auto">
-            Your intelligent DeFi companion v0.7
+            Your intelligent DeFi companion v0.8
           </p>
         </div>
       </div>
