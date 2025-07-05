@@ -1,3 +1,5 @@
+'use client';
+
 import React from "react";
 import { FaBitcoin } from "react-icons/fa";
 import { FiTrendingUp } from "react-icons/fi";
@@ -75,41 +77,46 @@ const tokens = [
   },
 ];
 
-export const PortfolioCard = () => (
-  <div className="flex flex-col gap-4">
-    <div className="text-center text-black font-extrabold text-2xl">Create a new portfolio</div>
-    <div className="bg-white rounded-xl !shadow-lg py-4 px-6">
-      <div className="text-center text-black text-lg font-semibold mb-4">Balanced Majors</div>
-      <div className="divide-y">
-        <div className="flex justify-between text-gray-500 font-medium pb-2">
-          <span>Token</span>
-          <span>Last 24h</span>
-          <span>Allocation</span>
-        </div>
-        {tokens.map((token) => (
-          <div key={token.symbol} className="flex items-center justify-between py-3">
-            <div className="flex items-center gap-2 min-w-[90px]">
-              {token.icon}
-              <span className="font-bold text-black">{token.symbol}</span>
-            </div>
-            <div className="flex items-center gap-1 justify-center min-w-[80px]">
-              <FiTrendingUp className="text-green-500 text-base" />
-              <span className="text-green-600 font-semibold">{token.change}</span>
-            </div>
-            <div className="flex items-center gap-2 min-w-[90px] justify-end">
-              <span className="font-semibold text-gray-700">{token.allocation}%</span>
-              <div className="w-10 h-2 bg-gray-200 rounded-full overflow-hidden">
-                <div className="bg-gray-700 h-full" style={{ width: `${token.allocation}%` }} />
+export const PortfolioCard = ({ onInvestClick }: { onInvestClick?: () => void }) => {
+  return (
+    <div className="flex flex-col gap-4">
+      <div className="text-center text-black font-extrabold text-2xl">Create a new portfolio</div>
+      <div className="bg-white rounded-xl !shadow-lg py-4 px-6">
+        <div className="text-center text-black text-lg font-semibold mb-4">Balanced Majors</div>
+        <div className="divide-y">
+          <div className="flex justify-between text-gray-500 font-medium pb-2">
+            <span>Token</span>
+            <span>Last 24h</span>
+            <span>Allocation</span>
+          </div>
+          {tokens.map((token) => (
+            <div key={token.symbol} className="flex items-center justify-between py-3">
+              <div className="flex items-center gap-2 min-w-[90px]">
+                {token.icon}
+                <span className="font-bold text-black">{token.symbol}</span>
+              </div>
+              <div className="flex items-center gap-1 justify-center min-w-[80px]">
+                <FiTrendingUp className="text-green-500 text-base" />
+                <span className="text-green-600 font-semibold">{token.change}</span>
+              </div>
+              <div className="flex items-center gap-2 min-w-[90px] justify-end">
+                <span className="font-semibold text-gray-700">{token.allocation}%</span>
+                <div className="w-10 h-2 bg-gray-200 rounded-full overflow-hidden">
+                  <div className="bg-gray-700 h-full" style={{ width: `${token.allocation}%` }} />
+                </div>
               </div>
             </div>
-          </div>
-        ))}
-      </div>
-      <div className="flex justify-center mt-6">
-        <button className="w-fit px-4 !bg-purple-700 !text-white font-bold text-lg py-2 rounded-xl shadow-md hover:bg-purple-700 transition">
-          Invest in this portfolio
-        </button>
+          ))}
+        </div>
+        <div className="flex justify-center mt-6">
+          <button
+            className="w-fit px-4 !bg-purple-700 !text-white font-bold text-lg py-2 rounded-xl shadow-md hover:bg-purple-700 transition"
+            onClick={onInvestClick}
+          >
+            Invest in this portfolio
+          </button>
+        </div>
       </div>
     </div>
-  </div>
-); 
+  );
+}; 
