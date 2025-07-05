@@ -1,10 +1,10 @@
 require("dotenv").config();
-const Web3 = require("web3");
+const Web3 = require("web3").default || require("web3");
 const { MongoClient } = require("mongodb");
 const cron = require("node-cron");
 
 // Init web3
-const web3 = new Web3(new Web3.providers.HttpProvider(process.env.WORLDCHAIN_RPC_URL));
+const web3 = new Web3(process.env.WORLDCHAIN_RPC_URL);
 const account = web3.eth.accounts.privateKeyToAccount(process.env.OPERATOR_PRIVATE_KEY);
 web3.eth.accounts.wallet.add(account);
 
@@ -13,23 +13,30 @@ const client = new MongoClient(process.env.MONGODB_URI);
 const db = client.db("mintro-db");
 const trades = db.collection("transactions");
 
-// Token addresses
-const USDC = process.env.USDC_ADDRESS;
+// Token addresses - converti in checksum
+const USDC = web3.utils.toChecksumAddress(process.env.USDC_ADDRESS);
+const WLD = web3.utils.toChecksumAddress(process.env.WLD_ADDRESS);
+const BTC = web3.utils.toChecksumAddress(process.env.BTC_ADDRESS);
+const SOL = web3.utils.toChecksumAddress(process.env.SOL_ADDRESS);
+
+const XRP = web3.utils.toChecksumAddress(process.env.XRP_ADDRESS);
+const DOGE = web3.utils.toChecksumAddress(process.env.DOGE_ADDRESS);
+const SUI = web3.utils.toChecksumAddress(process.env.SUI_ADDRESS);
 
 // === Investment structure ===
 
 // Institutional (70%)
 const institutionalTokens = {
-  [process.env.BTC_ADDRESS]: 40, // BTC
-  [process.env.SOL_ADDRESS]: 30, // SOL
-  [process.env.WLD_ADDRESS]: 30, // WLD
+  [BTC]: 40, // BTC
+  [SOL]: 30, // SOL
+  [WLD]: 30, // WLD
 };
 
 // Memecoin (30%)
 const memecoinTokens = {
-  [process.env.XRP_ADDRESS]: 50, // XRP
-  [process.env.DOGE_ADDRESS]: 30, // DOGE
-  [process.env.SUI_ADDRESS]: 20, // SUI
+  [XRP]: 50, // XRP
+  [DOGE]: 30, // DOGE
+  [SUI]: 20, // SUI
 };
 
 // Router config
@@ -41,25 +48,66 @@ const amountPerMonth = parseFloat(process.env.AMOUNT_PER_MONTH);
 const amountInstitutional = amountPerMonth * 0.7;
 const amountMemecoin = amountPerMonth * 0.3;
 
+// Minimal ERC20 ABI for approve & allowance
+const ERC20_ABI = [
+  {
+    constant: true,
+    inputs: [
+      { name: "_owner", type: "address" },
+      { name: "_spender", type: "address" },
+    ],
+    name: "allowance",
+    outputs: [{ name: "remaining", type: "uint256" }],
+    type: "function",
+  },
+  {
+    constant: false,
+    inputs: [
+      { name: "_spender", type: "address" },
+      { name: "_value", type: "uint256" },
+    ],
+    name: "approve",
+    outputs: [{ name: "success", type: "bool" }],
+    type: "function",
+  },
+];
+
 // ============ TRADE FUNCTION ============
 async function tradeUSDCtoToken(tokenAddress, amountInUSDC) {
   const deadline = Math.floor(Date.now() / 1000) + 60 * 10;
-  const amountIn = web3.utils.toWei(amountInUSDC.toString(), "mwei");
+  const amountIn = web3.utils.toWei(amountInUSDC.toString(), "mwei"); // USDC has 6 decimals
   const path = [USDC, tokenAddress];
 
+  // 1) Check allowance for router on USDC
+  const usdcContract = new web3.eth.Contract(ERC20_ABI, USDC);
+  const allowance = await usdcContract.methods.allowance(account.address, router.options.address).call();
+
+  if (BigInt(allowance) < BigInt(amountIn)) {
+    console.log(`Approving router to spend ${amountInUSDC} USDC...`);
+
+    const approveTx = usdcContract.methods.approve(router.options.address, amountIn);
+    const gasApprove = await approveTx.estimateGas({ from: account.address });
+    const gasPrice = await web3.eth.getGasPrice();
+
+    const approveReceipt = await approveTx.send({ from: account.address, gas: gasApprove, gasPrice });
+    console.log(`✅ Approval tx hash: ${approveReceipt.transactionHash}`);
+  } else {
+    console.log("Router already approved to spend sufficient USDC.");
+  }
+
+  // 2) Execute the swap
   const tx = router.methods.swapExactTokensForTokens(
-    amountIn, 0, path, account.address, deadline
+    amountIn,
+    0, // min amount out (slippage control to add later)
+    path,
+    account.address,
+    deadline
   );
 
   const gas = await tx.estimateGas({ from: account.address });
   const gasPrice = await web3.eth.getGasPrice();
-  const receipt = await web3.eth.sendTransaction({
-    from: account.address,
-    to: router.options.address,
-    data: tx.encodeABI(),
-    gas,
-    gasPrice,
-  });
+
+  const receipt = await tx.send({ from: account.address, gas, gasPrice });
 
   console.log(`✅ Traded ${amountInUSDC} USDC → ${tokenAddress} | Tx: ${receipt.transactionHash}`);
 
@@ -100,3 +148,6 @@ cron.schedule("0 10 1 * *", () => {
 });
 
 console.log("🚀 DCA bot is running...");
+
+// Avvia subito per test
+executeDCA().catch(console.error);
