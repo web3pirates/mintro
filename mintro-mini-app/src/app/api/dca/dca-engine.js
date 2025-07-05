@@ -1,11 +1,17 @@
-require("dotenv").config();
-const Web3 = require("web3").default || require("web3");
-const { MongoClient } = require("mongodb");
-const cron = require("node-cron");
+import dotenv from "dotenv";
+import Web3 from "web3";
+import { MongoClient } from "mongodb";
+import cron from "node-cron";
+import routerAbi from "./abi/UniswapV2Router02.json" assert { type: "json" };
+import smartWalletAbi from "./abi/SmartWalletAbi.json" assert { type: "json" };
+
+dotenv.config();
 
 // Init Web3
 const web3 = new Web3(process.env.WORLDCHAIN_RPC_URL);
-const account = web3.eth.accounts.privateKeyToAccount(process.env.OPERATOR_PRIVATE_KEY);
+const account = web3.eth.accounts.privateKeyToAccount(
+  process.env.OPERATOR_PRIVATE_KEY
+);
 web3.eth.accounts.wallet.add(account);
 
 // Setup MongoDB
@@ -36,7 +42,6 @@ const memecoinTokens = {
 };
 
 // Router config
-const routerAbi = require("./abi/UniswapV2Router02.json");
 const router = new web3.eth.Contract(routerAbi, process.env.ROUTER_ADDRESS);
 
 // Amount to allocate
@@ -45,12 +50,19 @@ const amountInstitutional = amountPerMonth * 0.7;
 const amountMemecoin = amountPerMonth * 0.3;
 
 // ======= TRADE FUNCTION =======
-async function tradeUSDCtoToken(tokenAddress, amountInUSDC, userSmartWalletAddress, nonce) {
+async function tradeUSDCtoToken(
+  tokenAddress,
+  amountInUSDC,
+  userSmartWalletAddress,
+  nonce
+) {
   const amountIn = web3.utils.toWei(amountInUSDC.toString(), "mwei"); // USDC = 6 decimals
   const amountOutMin = 0;
 
-  const smartWalletAbi = require("./abi/SmartWalletAbi.json");
-  const smartWallet = new web3.eth.Contract(smartWalletAbi, userSmartWalletAddress);
+  const smartWallet = new web3.eth.Contract(
+    smartWalletAbi,
+    userSmartWalletAddress
+  );
 
   console.log("\n========== 🚀 Executing performSwapV2 ==========");
   console.log("→ SmartWallet:", userSmartWalletAddress);
@@ -78,10 +90,12 @@ async function tradeUSDCtoToken(tokenAddress, amountInUSDC, userSmartWalletAddre
       from: account.address,
       gas,
       gasPrice,
-      nonce
+      nonce,
     });
 
-    console.log(`✅ Traded ${amountInUSDC} USDC → ${tokenAddress} via SmartWallet | Tx: ${receipt.transactionHash}`);
+    console.log(
+      `✅ Traded ${amountInUSDC} USDC → ${tokenAddress} via SmartWallet | Tx: ${receipt.transactionHash}`
+    );
 
     await trades.insertOne({
       token: tokenAddress,
@@ -101,7 +115,12 @@ async function tradeUSDCtoToken(tokenAddress, amountInUSDC, userSmartWalletAddre
 }
 
 // ======= EXECUTE FOR CATEGORY =======
-async function executeCategory(name, totalAmount, tokenMap, smartWalletAddress) {
+async function executeCategory(
+  name,
+  totalAmount,
+  tokenMap,
+  smartWalletAddress
+) {
   console.log(`\n🪙 Executing ${name.toUpperCase()} DCA...`);
   const totalPerc = Object.values(tokenMap).reduce((sum, p) => sum + p, 0);
   let nonce = await web3.eth.getTransactionCount(account.address, "pending");
@@ -124,7 +143,12 @@ async function executeDCA() {
     process.exit(1);
   }
 
-  await executeCategory("institutional", amountInstitutional, institutionalTokens, smartWalletAddress);
+  await executeCategory(
+    "institutional",
+    amountInstitutional,
+    institutionalTokens,
+    smartWalletAddress
+  );
   // await executeCategory("memecoin", amountMemecoin, memecoinTokens, smartWalletAddress);
 
   await client.close();
@@ -140,6 +164,4 @@ console.log("🚀 DCA bot is running...");
 // Run immediately for test
 executeDCA().catch(console.error);
 
-module.exports = {
-  executeDCA
-};
+export { executeDCA };

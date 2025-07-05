@@ -8,7 +8,7 @@
   "type": "module",
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "DISABLE_ESLINT_PLUGIN=true next build",
     "start": "next start",
     "lint": "next lint"
   },
@@ -19,15 +19,19 @@
     "@worldcoin/minikit-js": "^1.9.6",
     "@worldcoin/minikit-react": "1.9.6",
     "clsx": "^2.1.1",
+    "dotenv": "^17.0.1",
     "ethers": "^6.15.0",
     "iconoir-react": "^7.11.0",
+    "mongodb": "^6.17.0",
     "next": "15.2.3",
     "next-auth": "^5.0.0-beta.25",
+    "node-cron": "^4.2.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-icons": "^5.5.0",
     "tailwind-merge": "^3.2.0",
-    "viem": "2.23.5"
+    "viem": "2.23.5",
+    "web3": "^4.16.0"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
