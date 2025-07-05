@@ -1,6 +1,6 @@
 'use client'
 import React, { useState } from 'react';
-import { Search, Gift, Bell, Globe, MoreHorizontal, TrendingUp, TrendingDown, Send, ArrowDownToLine, ArrowUpDown, ShoppingCart } from 'lucide-react';
+import { MoreHorizontal, TrendingUp, TrendingDown, Send, ArrowDownToLine, ArrowUpDown, ShoppingCart } from 'lucide-react';
 
 const WalletDashboard = () => {
   const [activeTab, setActiveTab] = useState('tokens');
@@ -70,10 +70,17 @@ const WalletDashboard = () => {
 
   const getNetworkIcon = (network:any) => {
     const icons:any = {
-      ethereum: '🟣',
-      iota: '🔵',
-      bsc: '🟡',
-      bitcoin: '🟠'
+      ethereum: 'ETH',
+      iota: 'IOTA',
+      bsc: 'BNB',
+      bitcoin: 'BTC',
+      usdt: 'USDT',
+      polygon: 'MATIC',
+      solana: 'SOL',
+      avalanche: 'AVAX',
+      cardano: 'ADA',
+      polkadot: 'DOT',
+      ripple: 'XRP',
     };
     return icons[network] || '⚪';
   };
@@ -92,7 +99,7 @@ const WalletDashboard = () => {
               <p className="text-gray-600">186 tokens</p>
             </div>
             <div className="flex space-x-3">
-              <button className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-full flex items-center space-x-2 transition-colors">
+              <button className="text-white px-4 py-2 rounded-full flex items-center space-x-2" style={{backgroundColor: 'rgb(17 24 39)'}}>
                 <ArrowDownToLine className="w-4 h-4" />
                 <span>Receive</span>
               </button>
@@ -113,7 +120,7 @@ const WalletDashboard = () => {
         </div>
 
         {/* Tabs */}
-        <div className="border-b border-gray-800 mb-6">
+        <div className="border-t border-gray-200 mb-6">
           <nav className="flex space-x-8">
             {['tokens', 'activity'].map((tab) => (
               <button
@@ -135,7 +142,7 @@ const WalletDashboard = () => {
         {activeTab === 'tokens' && (
           <div className="space-y-4">
             {/* Table Header */}
-            <div className="grid grid-cols-12 gap-4 px-4 py-2 text-sm text-gray-400 border-b border-gray-800">
+            <div className="grid grid-cols-12 gap-4 px-4 py-2 text-sm text-gray-400 ">
               <div className="col-span-3">Token</div>
               <div className="col-span-2">Available</div>
               <div className="col-span-2">24H Price</div>
@@ -153,9 +160,6 @@ const WalletDashboard = () => {
                 >
                   {/* Token Info */}
                   <div className="col-span-3 flex items-center space-x-3">
-                    <div className="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center text-lg">
-                      {token.icon}
-                    </div>
                     <div>
                       <div className="font-medium">{token.name}</div>
                       <div className="text-gray-400 text-sm">{token.symbol}</div>

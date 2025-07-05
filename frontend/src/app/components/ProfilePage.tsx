@@ -17,7 +17,7 @@ import WalletDashboard from './WalletDashboard';
 import Post from './Post';
 
 export default function ProfilePage() {
-  const [activeTab, setActiveTab] = useState('Posts');
+  const [activeTab, setActiveTab] = useState('Feed');
 
   const recentTrades = [
     { action: 'Bought', token: 'BNB', amount: '$2,540', time: '1 hour ago' },
@@ -38,16 +38,16 @@ export default function ProfilePage() {
       {/* Header */}
       <div className="flex items-center justify-between p-4 ">
         <div className="flex items-center space-x-4">
-         <div className="w-8 h-8  rounded-full flex items-center justify-center" style={{backgroundColor: 'rgb(17 24 39)'}}>
-            <span className="text-white font-bold">★</span>
+         <div className="w-20 h-8  rounded-full flex items-center justify-center text-2xl font-bold" style={{color: 'rgb(17 24 39)'}}>
+            Mintro
         </div>
 
           <div className="flex items-center space-x-2 bg-gray-100 rounded-full px-3 py-2 flex-1 max-w-md">
-            <Search className="w-4 h-4 text-gray-500" />
+            <Search className=" h-4 text-gray-500" />
             <input 
               type="text" 
               placeholder="Search" 
-              className="bg-transparent border-none outline-none text-foreground placeholder-gray-500 flex-1"
+              className="bg-transparent border-none outline-none text-foreground placeholder-gray-500 "
             />
           </div>
         </div>
@@ -66,8 +66,8 @@ export default function ProfilePage() {
 
       <div className="flex">
         {/* Sidebar */}
-        <div className="  p-8 space-y-4 flex flex-col justify-center" style={{color: 'rgb(17 24 39)'}}>
-          <div className="space-y-2 flex flex-col items-center">
+        <div className=" w-30  p-8 space-y-4 flex flex-col " style={{color: 'rgb(17 24 39)'}}>
+         {/* <div className="space-y-2 flex flex-col items-center">
             <div className="w-8 h-8 rounded-full" style={{backgroundColor: 'rgb(180 180 184)'}}></div>
             <div className="w-8 h-8 rounded-full" style={{backgroundColor: 'rgb(180 180 184)'}}></div>
             <button className="w-12 h-12 rounded-full flex items-center justify-center" style={{backgroundColor: 'rgb(17 24 39)'}} >
@@ -75,7 +75,7 @@ export default function ProfilePage() {
             </button>
             <div className="w-8 h-8  rounded-full" style={{backgroundColor: 'rgb(180 180 184)'}}></div>
             <div className="w-8 h-8  rounded-full" style={{backgroundColor: 'rgb(180 180 184)'}}></div>
-          </div>
+          </div> */}
         </div>
 
         {/* Main Content */}
@@ -98,9 +98,6 @@ export default function ProfilePage() {
                     <Edit className="w-4 h-4 text-white font-bold" />
                     <span className="text-white " >Edit</span>
                   </button>
-                  <button className="p-2  rounded-full hover:bg-gray-900">
-                    <MoreHorizontal className="w-4 h-4" />
-                  </button>
                 </div>
               </div>
               
@@ -116,13 +113,13 @@ export default function ProfilePage() {
           {/* Navigation Tabs */}
           <div className="px-6">
             <div className="flex space-x-8">
-              {['Posts', 'Portfolio'].map((tab) => (
+              {['Feed', 'Portfolio'].map((tab) => (
                 <button
                   key={tab}
                   onClick={() => setActiveTab(tab)}
                   className={`py-4 px-2  font-medium ${
                     activeTab === tab
-                      ? ' text-blue-500'
+                      ? 'text-blue-500'
                       : 'border-transparent text-gray-400 '
                   }`}
                 >
@@ -130,15 +127,10 @@ export default function ProfilePage() {
                 </button>
               ))}
             </div>
-            <div className="flex justify-end py-2">
-              <button className="p-2 hover:bg-gray-900 rounded-full">
-                <Filter className="w-4 h-4" />
-              </button>
-            </div>
           </div>
            {/* Tab Content */}
         <div className="border-t border-gray-200">
-          {activeTab === 'Posts' && (
+          {activeTab === 'Feed' && (
             <div className="px-6 py-8">
             <Post />
             </div>

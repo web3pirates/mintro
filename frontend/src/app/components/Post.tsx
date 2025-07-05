@@ -13,17 +13,9 @@ export default function Post() {
           <div className="flex-1">
             <div className="flex items-center space-x-2 text-sm" style={{color: 'rgb(17 24 39)'}}>
               <span className="font-bold">Roberta D'Agostino</span>
-              <span>New</span>
             </div>
-            <p className="mt-1" style={{color: 'rgb(17 24 39)'}}>
-              Binance is too big to fail. With their ecosystem, BNB could surprise everyone this cycle. 🔥 Time to load up? 🚀❤️
-            </p>
             <div className="mt-3 p-3 bg-gray-50 rounded-lg border border-gray-200">
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-sm text-foreground" style={{color: 'rgb(17 24 39)'}}>Bought 🪙 BNB worth $9,150.75 on 🌕 Binance</span>
-                <div className="w-6 h-6 bg-yellow-500 rounded-full"></div>
-              </div>
-              
+
               {/* Chart */}
               <div className="h-32 bg-gray-100 rounded relative mb-2 border" >
                 <svg className="w-full h-full" viewBox="0 0 400 120">
