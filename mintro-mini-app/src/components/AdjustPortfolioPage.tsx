@@ -78,7 +78,7 @@ function PortfolioSliderCard({ allocations, setAllocations }: any) {
           icon={token.icon}
           symbol={token.symbol}
           value={allocations[idx]}
-          onChange={e => {
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
             const newAlloc = [...allocations];
             newAlloc[idx] = Number(e.target.value);
             setAllocations(newAlloc);
@@ -93,7 +93,7 @@ function PortfolioSliderCard({ allocations, setAllocations }: any) {
 function ErrorMessage({ show }: { show: boolean }) {
   if (!show) return null;
   return (
-    <div className="text-center text-red-500 font-semibold mt-6">
+    <div className="text-center text-red-500 font-semibold mt-3">
       Total must equal 100%
     </div>
   );
@@ -101,7 +101,7 @@ function ErrorMessage({ show }: { show: boolean }) {
 
 function FooterButtons({ onSkip, onConfirm, disabled }: any) {
   return (
-    <div className="flex justify-between gap-4 mt-12 w-full max-w-md mx-auto">
+    <div className="fixed bottom-0 left-0 w-full max-w-md mx-auto flex justify-between gap-4 px-4 pb-6 bg-white z-20">
       <button
         className="flex-1 border border-gray-300 text-gray-500 font-bold py-3 rounded-xl bg-white hover:bg-gray-100 transition"
         onClick={onSkip}
@@ -109,7 +109,7 @@ function FooterButtons({ onSkip, onConfirm, disabled }: any) {
         Skip
       </button>
       <button
-        className="flex-1 bg-purple-600 text-white font-bold py-3 rounded-xl shadow-md hover:bg-purple-700 transition disabled:opacity-50"
+        className="flex-1 !bg-purple-600 !text-white font-bold !py-3 rounded-xl !shadow-md hover:bg-purple-800 transition disabled:opacity-50"
         onClick={onConfirm}
         disabled={disabled}
       >
@@ -119,22 +119,24 @@ function FooterButtons({ onSkip, onConfirm, disabled }: any) {
   );
 }
 
-export default function AdjustPortfolioPage({ hideBackButton }: { hideBackButton?: boolean }) {
-  const [allocations, setAllocations] = useState([33, 33, 33]);
+export default function AdjustPortfolioPage({ 
+  hideBackButton, 
+  onSkip, 
+  onConfirm, 
+  allocations, 
+  onAllocationsChange 
+}: { 
+  hideBackButton?: boolean, 
+  onSkip?: () => void, 
+  onConfirm?: () => void,
+  allocations: number[],
+  onAllocationsChange: (allocations: number[]) => void
+}) {
   const total = allocations.reduce((a, b) => a + b, 0);
   const hasError = total !== 100;
 
-  const handleSkip = () => {
-    // navigation logic here
-    alert("Skipped");
-  };
-  const handleConfirm = () => {
-    // confirm logic here
-    alert("Confirmed: " + allocations.join(", "));
-  };
-
   return (
-    <div className="min-h-screen bg-white flex flex-col items-center pt-8 px-4">
+    <div className="min-h-screen bg-white flex flex-col items-center pt-8 px-4 pb-32">
       {!hideBackButton && (
         <button className="self-start mb-4" onClick={() => window.history.back()}>
           <span className="text-2xl">←</span>
@@ -143,10 +145,10 @@ export default function AdjustPortfolioPage({ hideBackButton }: { hideBackButton
       <div className="w-full max-w-md mx-auto">
         <div className="text-2xl font-extrabold text-black">Adjust your portfolio</div>
         <div className="text-xl font-bold text-gray-400 mb-6">(Optional)</div>
-        <PortfolioSliderCard allocations={allocations} setAllocations={setAllocations} />
+        <PortfolioSliderCard allocations={allocations} setAllocations={onAllocationsChange} />
         <ErrorMessage show={hasError} />
-        <FooterButtons onSkip={handleSkip} onConfirm={handleConfirm} disabled={hasError} />
       </div>
+      <FooterButtons onSkip={onSkip} onConfirm={onConfirm} disabled={hasError} />
     </div>
   );
 } 

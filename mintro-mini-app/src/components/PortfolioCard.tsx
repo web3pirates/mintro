@@ -1,7 +1,7 @@
 'use client';
 
 import React from "react";
-import { FaBitcoin } from "react-icons/fa";
+import { FaBitcoin, FaEthereum } from "react-icons/fa";
 import { FiTrendingUp } from "react-icons/fi";
 
 const SolanaIcon = () => (
@@ -55,7 +55,7 @@ const tokens = [
     symbol: "WLD",
     name: "Worldcoin",
     icon: <WorldcoinIcon />,
-    change: "+12.2%",
+    change: "+1.2%",
     changeColor: "text-green-600",
     allocation: 30,
   },
@@ -63,15 +63,15 @@ const tokens = [
     symbol: "BTC",
     name: "Bitcoin",
     icon: <FaBitcoin className="text-2xl text-[#F7931A]" />,
-    change: "+1.5%",
+    change: "+2.9%",
     changeColor: "text-green-600",
     allocation: 40,
   },
   {
-    symbol: "SOL",
-    name: "Solana",
-    icon: <SolanaIcon />,
-    change: "+3.4%",
+    symbol: "WETH",
+    name: "Ethereum",
+    icon: <FaEthereum className="text-2xl text-[#627EEA]" />,
+    change: "+1.2%",
     changeColor: "text-green-600",
     allocation: 30,
   },
@@ -110,7 +110,7 @@ export const PortfolioCard = ({ onInvestClick }: { onInvestClick?: () => void })
         </div>
         <div className="flex justify-center mt-6">
           <button
-            className="w-fit px-4 !bg-purple-700 !text-white font-bold text-lg py-2 rounded-xl shadow-md hover:bg-purple-700 transition"
+            className="w-fit px-4 !bg-purple-800 !text-white font-bold text-lg py-2 rounded-xl shadow-md hover:bg-purple-800 transition"
             onClick={onInvestClick}
           >
             Invest in this portfolio
