@@ -29,6 +29,16 @@ export default function Home() {
     );
   }
 
+  async function handleConfirm() {
+    console.log("Confirming plan", allocations, amount, frequency);
+    const res = await fetch("/api/dca", {
+      method: "POST",
+      body: JSON.stringify({ allocations, amount, frequency }),
+    });
+    const data = await res.json();
+    console.log("DCA response", data);
+  }
+
   if (screen === "adjust") {
     return (
       <div className="min-h-screen bg-white flex flex-col items-center justify-start pt-8 px-4">
@@ -54,7 +64,8 @@ export default function Home() {
         onBack={() => setScreen("invest")} 
         allocations={allocations} 
         amount={amount} 
-        frequency={frequency} 
+        frequency={frequency}
+        onConfirm={handleConfirm}
       />
     );
   }
