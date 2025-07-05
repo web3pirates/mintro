@@ -26,13 +26,15 @@ const SUI = web3.utils.toChecksumAddress(process.env.SUI_ADDRESS);
 // === Investment structure ===
 
 const institutionalTokens = {
-  [BTC]: 57,
-  [WLD]: 43,
+  [BTC]: 40,
+  [SOL]: 30,
+  [WLD]: 30,
 };
 
 const memecoinTokens = {
-  [XRP]: 71,
-  [SUI]: 29,
+  [XRP]: 50,
+  [DOGE]: 30,
+  [SUI]: 20,
 };
 
 // Router config
