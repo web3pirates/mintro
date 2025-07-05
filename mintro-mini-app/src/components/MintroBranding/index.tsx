@@ -18,46 +18,46 @@ interface SwapNotification {
 }
 
 const mockSwapNotifications: SwapNotification[] = [
-  {
-    id: "1",
-    timestamp: "2024-01-15T10:30:00Z",
-    type: "swap",
-    title: "ETH → USDC Swap",
-    description: "Swapped 0.5 ETH for 1,250 USDC",
-    amount: "0.5 ETH",
-    token: "USDC",
-    status: "completed",
-  },
-  {
-    id: "2",
-    timestamp: "2024-01-14T15:45:00Z",
-    type: "liquidity",
-    title: "Added Liquidity",
-    description: "Added 1000 USDC + 0.4 ETH to Uniswap V3",
-    amount: "1000 USDC",
-    token: "ETH",
-    status: "completed",
-  },
-  {
-    id: "3",
-    timestamp: "2024-01-13T09:20:00Z",
-    type: "yield",
-    title: "Yield Farming",
-    description: "Started farming with 500 USDC on Compound",
-    amount: "500 USDC",
-    token: "COMP",
-    status: "pending",
-  },
-  {
-    id: "4",
-    timestamp: "2024-01-12T14:15:00Z",
-    type: "swap",
-    title: "USDC → DAI Swap",
-    description: "Swapped 500 USDC for 500 DAI",
-    amount: "500 USDC",
-    token: "DAI",
-    status: "completed",
-  },
+  // {
+  //   id: "1",
+  //   timestamp: "2024-01-15T10:30:00Z",
+  //   type: "swap",
+  //   title: "ETH → USDC Swap",
+  //   description: "Swapped 0.5 ETH for 1,250 USDC",
+  //   amount: "0.5 ETH",
+  //   token: "USDC",
+  //   status: "completed",
+  // },
+  // {
+  //   id: "2",
+  //   timestamp: "2024-01-14T15:45:00Z",
+  //   type: "liquidity",
+  //   title: "Added Liquidity",
+  //   description: "Added 1000 USDC + 0.4 ETH to Uniswap V3",
+  //   amount: "1000 USDC",
+  //   token: "ETH",
+  //   status: "completed",
+  // },
+  // {
+  //   id: "3",
+  //   timestamp: "2024-01-13T09:20:00Z",
+  //   type: "yield",
+  //   title: "Yield Farming",
+  //   description: "Started farming with 500 USDC on Compound",
+  //   amount: "500 USDC",
+  //   token: "COMP",
+  //   status: "pending",
+  // },
+  // {
+  //   id: "4",
+  //   timestamp: "2024-01-12T14:15:00Z",
+  //   type: "swap",
+  //   title: "USDC → DAI Swap",
+  //   description: "Swapped 500 USDC for 500 DAI",
+  //   amount: "500 USDC",
+  //   token: "DAI",
+  //   status: "completed",
+  // },
 ];
 
 const getStatusColor = (status: string) => {
@@ -113,7 +113,7 @@ export const MintroBranding = () => {
             Mintro
           </h1>
           <p className="text-xl md:text-2xl text-white max-w-3xl mx-auto">
-            Your intelligent DeFi companion v0.8
+            Your intelligent DeFi companion v0.9
           </p>
         </div>
       </div>
