@@ -20,6 +20,9 @@ export const PrivyProvider = ({ children }: PrivyProviderProps) => {
           theme: "light",
           accentColor: "#676FFF",
         },
+        siwe: {
+          enabled: true,
+        },
       }}
     >
       {children}
