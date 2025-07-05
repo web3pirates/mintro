@@ -2,7 +2,7 @@
 
 import { ImArrowUp } from "react-icons/im";
 export const MarketSentimentCard = () => (
-  <div className="bg-white rounded-2xl !shadow-lg p-6 mb-6 flex flex-col items-center">
+  <div className="bg-white rounded-2xl !shadow-lg p-6 mb-6 flex flex-col items-center mt-4">
     <div className="text-2xl !font-extrabold text-neutral-800 mb-2">Market Outlook</div>
 
     <div className="mb-4">
