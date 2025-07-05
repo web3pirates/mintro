@@ -1,4 +1,6 @@
-import { auth } from "@/auth";
+"use client";
+
+import { useWorldcoinAuth } from "@/hooks/useWorldcoinAuth";
 import { Page } from "@/components/PageLayout";
 import { LogoutButton } from "@/components/LogoutButton";
 import { Pay } from "@/components/Pay";
@@ -9,8 +11,20 @@ import { ViewPermissions } from "@/components/ViewPermissions";
 import { WalletBalance } from "@/components/WalletBalance";
 import { Marble, TopBar } from "@worldcoin/mini-apps-ui-kit-react";
 
-export default async function Home() {
-  const session = await auth();
+export default function Home() {
+  const { user, isLoading } = useWorldcoinAuth();
+
+  if (isLoading) {
+    return (
+      <Page>
+        <Page.Main className="flex items-center justify-center">
+          <div className="text-center">
+            <p className="text-lg">Loading...</p>
+          </div>
+        </Page.Main>
+      </Page>
+    );
+  }
 
   return (
     <>
@@ -20,9 +34,9 @@ export default async function Home() {
           endAdornment={
             <div className="flex items-center gap-2">
               <p className="text-sm font-semibold capitalize">
-                {session?.user.username}
+                {user?.username || "User"}
               </p>
-              <Marble src={session?.user.profilePictureUrl} className="w-12" />
+              <Marble src={user?.profilePictureUrl} className="w-12" />
             </div>
           }
         />

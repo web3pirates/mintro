@@ -1,4 +1,3 @@
-import { auth } from "@/auth";
 import ClientProviders from "@/providers";
 import "@worldcoin/mini-apps-ui-kit-react/styles.css";
 import type { Metadata } from "next";
@@ -29,14 +28,13 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const session = await auth();
   return (
     <html lang="en" suppressHydrationWarning>
       <body
         className={`${geistSans.variable} ${geistMono.variable} `}
         suppressHydrationWarning
       >
-        <ClientProviders session={session}>{children}</ClientProviders>
+        <ClientProviders>{children}</ClientProviders>
       </body>
     </html>
   );

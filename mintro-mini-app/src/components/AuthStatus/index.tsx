@@ -1,22 +1,23 @@
 "use client";
 
-import { useSession, signOut } from "next-auth/react";
 import { Button } from "@worldcoin/mini-apps-ui-kit-react";
 import { useMiniKit } from "@worldcoin/minikit-js/minikit-provider";
+import { useWorldcoinAuth } from "@/hooks/useWorldcoinAuth";
 
 export const AuthStatus = () => {
-  const { data: session, status } = useSession();
+  const { user, isLoading, isAuthenticated, logout } = useWorldcoinAuth();
   const { isInstalled } = useMiniKit();
 
   // Debug environment variables
   console.log("Environment Debug:", {
     NEXT_PUBLIC_WLD_CLIENT_ID: process.env.NEXT_PUBLIC_WLD_CLIENT_ID,
     isInstalled,
-    sessionStatus: status,
-    hasSession: !!session,
+    isLoading,
+    isAuthenticated,
+    hasUser: !!user,
   });
 
-  if (status === "loading") {
+  if (isLoading) {
     return (
       <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
         <h3 className="text-lg font-semibold text-blue-800 mb-2">
@@ -29,7 +30,7 @@ export const AuthStatus = () => {
     );
   }
 
-  if (session) {
+  if (isAuthenticated && user) {
     return (
       <div className="p-4 bg-green-50 border border-green-200 rounded-lg">
         <h3 className="text-lg font-semibold text-green-800 mb-2">
@@ -37,18 +38,13 @@ export const AuthStatus = () => {
         </h3>
         <div className="space-y-2 text-sm text-green-700">
           <div>
-            <strong>Username:</strong> {session.user.username}
+            <strong>Username:</strong> {user.username || "Not set"}
           </div>
           <div>
-            <strong>Wallet Address:</strong> {session.user.walletAddress}
+            <strong>Wallet Address:</strong> {user.address}
           </div>
         </div>
-        <Button
-          onClick={() => signOut({ callbackUrl: "/" })}
-          size="sm"
-          variant="secondary"
-          className="mt-3"
-        >
+        <Button onClick={logout} size="sm" variant="secondary" className="mt-3">
           Logout
         </Button>
       </div>

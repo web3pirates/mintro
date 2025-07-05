@@ -1,6 +1,6 @@
 "use client";
 
-import { usePrivy } from "@privy-io/react-auth";
+import { useWorldcoinAuth } from "@/hooks/useWorldcoinAuth";
 import { Button } from "@worldcoin/mini-apps-ui-kit-react";
 
 interface SwapNotification {
@@ -84,7 +84,7 @@ const getTypeIcon = (type: string) => {
 };
 
 export const MintroBranding = () => {
-  const { authenticated } = usePrivy();
+  const { isLoading, isAuthenticated } = useWorldcoinAuth();
 
   return (
     <div className="max-w-4xl mx-auto space-y-8">
@@ -95,7 +95,7 @@ export const MintroBranding = () => {
             Mintro
           </h1>
           <p className="text-xl md:text-2xl text-white max-w-3xl mx-auto">
-            Your intelligent DeFi companion v0.7
+            Your intelligent DeFi companion v0.4
           </p>
         </div>
       </div>
@@ -147,7 +147,11 @@ export const MintroBranding = () => {
 
       {/* Action Button */}
       <div className="text-center pt-8">
-        {authenticated ? (
+        {isLoading ? (
+          <div className="space-y-4">
+            <p className="text-white">Loading...</p>
+          </div>
+        ) : isAuthenticated ? (
           <div className="space-y-4">
             <Button size="lg" variant="primary" className="px-8">
               🚀 Start Trading
@@ -159,7 +163,8 @@ export const MintroBranding = () => {
         ) : (
           <div className="space-y-4">
             <p className="text-white">
-              Connect your wallet to start tracking your DeFi portfolio
+              Connect your World App wallet to start tracking your DeFi
+              portfolio
             </p>
           </div>
         )}
