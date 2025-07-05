@@ -12,6 +12,7 @@
     "@circle-fin/developer-controlled-wallets": "^8.3.0",
     "axios": "^1.10.0",
     "dotenv": "^17.0.1",
+    "ethers": "^6.15.0",
     "next": "15.3.5",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"
