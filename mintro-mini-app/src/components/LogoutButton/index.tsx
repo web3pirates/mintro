@@ -2,16 +2,14 @@
 
 import { Button } from "@worldcoin/mini-apps-ui-kit-react";
 import { useWorldcoinAuth } from "@/hooks/useWorldcoinAuth";
-import { useRouter } from "next/navigation";
 
 export const LogoutButton = () => {
   const { logout } = useWorldcoinAuth();
-  const router = useRouter();
 
   const handleLogout = async () => {
     try {
       logout();
-      router.push("/");
+      window.location.reload(); // Soft reload, resets all state
     } catch (error) {
       console.error("Logout error:", error);
     }
