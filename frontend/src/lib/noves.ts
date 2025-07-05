@@ -6,7 +6,6 @@ const NOVES_API_KEY = process.env.NOVES_API_KEY!;
 
 export async function decodeTxWithNoves(txHash: string) {
   try {
-    console.log(`https://translate.noves.fi/evm/worldchain/tx/${txHash}?v5Format=false`);
     const response = await axios.get(
       `https://translate.noves.fi/evm/worldchain/tx/${txHash}?v5Format=false`,
       {
@@ -16,9 +15,6 @@ export async function decodeTxWithNoves(txHash: string) {
         },
       }
     );
-
-    console.log(response.data.rarTransactionData);
-    console.log(response.data.classificationData);
 
     return response.data || null;
   } catch (err: unknown) {

@@ -15,8 +15,12 @@ const alchemy = new Alchemy(settings);
 let isProcessing = false;
 let processingQueue: string[] = [];
 const MAX_CONCURRENT_REQUESTS = 1;
-const RATE_LIMIT_DELAY = 10000; // 10 seconds between batches
+const RATE_LIMIT_DELAY = 1000; // 10 seconds between batches
 let lastProcessedBlock = 0;
+
+// Data collection for interesting transactions
+let interestingTransactions: any[] = [];
+const MAX_STORED_TRANSACTIONS = 1000; // Keep last 1000 transactions
 
 // Filter transactions to reduce API calls
 function shouldProcessTransaction(tx: any): boolean {
@@ -26,7 +30,8 @@ function shouldProcessTransaction(tx: any): boolean {
   }
   
   // Skip transactions with very low gas (likely simple transfers)
-  if (tx.transaction.gas && parseInt(tx.transaction.gas) < 21000) {
+  // But allow higher gas transactions that might be DeFi interactions
+  if (tx.transaction.gas && parseInt(tx.transaction.gas) < 50000) {
     return false;
   }
   
@@ -39,7 +44,17 @@ function shouldProcessTransaction(tx: any): boolean {
     return false;
   }
   
-  return true;
+  // Prioritize transactions with data (contract calls)
+  if (tx.transaction.data && tx.transaction.data !== '0x') {
+    return true;
+  }
+  
+  // Also process high-value transfers
+  if (tx.transaction.value && parseInt(tx.transaction.value) > 1000000000000000000) { // > 1 ETH
+    return true;
+  }
+  
+  return false;
 }
 
 async function processTransactionQueue() {
@@ -62,28 +77,79 @@ async function processTransactionQueue() {
             
             if (!decoded) return;
             
-            const actions = decoded.actions || [];
-            const isTrade = actions.some((a: any) => a.type === 'TRADE');
+            // Extract data from Noves response
+            const classificationData = decoded.classificationData;
+            const rawData = decoded.rawTransactionData;
             
-            if (!isTrade) return;
+            if (!classificationData) return;
             
+            // Check for various interesting transaction types
+            const txType = classificationData.type;
+            const description = classificationData.description;
+            const protocol = classificationData.protocol?.name;
+            const senderAddress = classificationData.senderAddress;
             const usdValue = decoded.usd_value || 0;
-            const from = decoded.from_address;
             
-            const protocols = actions
-              .filter((a: any) => a.type === 'TRADE')
-              .map((a: any) => a.protocol)
-              .filter(Boolean);
+            // Define interesting transaction types
+            const interestingTypes = [
+              'swap',
+              'composite'
+            ];
             
-            const tokens = actions
-              .filter((a: any) => a.type === 'TRADE')
-              .map((a: any) => `${a.token_in?.symbol} → ${a.token_out?.symbol}`);
+            const isInteresting = interestingTypes.some(type => 
+              txType?.toLowerCase().includes(type) || 
+              description?.toLowerCase().includes(type)
+            );
+
+            console.log({isInteresting})
             
-            console.log(`📈 TRADE detected!`);
-            console.log(`↳ Trader: ${from}`);
+            if (!isInteresting) return;
+            
+            // Extract token information if available
+            const sent = classificationData.sent || [];
+            const received = classificationData.received || [];
+            
+            const tokens = [
+              ...sent.map((s: any) => s.token?.symbol).filter(Boolean),
+              ...received.map((r: any) => r.token?.symbol).filter(Boolean)
+            ];
+            
+            console.log(`📈 INTERESTING TRANSACTION detected!`);
+            console.log(`↳ Type: ${txType}`);
+            console.log(`↳ Description: ${description}`);
+            console.log(`↳ Sender: ${senderAddress || rawData?.fromAddress}`);
             console.log(`↳ Value: $${usdValue.toFixed(2)}`);
-            console.log(`↳ Token: ${tokens.join(', ')}`);
-            console.log(`↳ Protocol: ${protocols.join(', ')}\n`);
+            console.log(`↳ Protocol: ${protocol || 'Unknown'}`);
+            console.log(`↳ Tokens: ${tokens.join(', ')}`);
+            console.log(`↳ Gas Used: ${rawData?.gasUsed || 'Unknown'}`);
+            console.log(`↳ Transaction Fee: ${rawData?.transactionFee?.amount || 'Unknown'} ${rawData?.transactionFee?.token?.symbol || ''}`);
+            console.log(`↳ Hash: ${txHash}\n`);
+            
+            // Store interesting transaction data
+            const transactionData = {
+              timestamp: new Date().toISOString(),
+              hash: txHash,
+              type: txType,
+              description,
+              sender: senderAddress || rawData?.fromAddress,
+              usdValue,
+              protocol: protocol || 'Unknown',
+              tokens,
+              gasUsed: rawData?.gasUsed,
+              transactionFee: rawData?.transactionFee,
+              blockNumber: rawData?.blockNumber,
+              rawData: decoded
+            };
+
+            console.log(transactionData.rawData.classificationData)
+            
+            interestingTransactions.push(transactionData);
+            
+            // Keep only the last MAX_STORED_TRANSACTIONS
+            if (interestingTransactions.length > MAX_STORED_TRANSACTIONS) {
+              interestingTransactions = interestingTransactions.slice(-MAX_STORED_TRANSACTIONS);
+            }
+            
           } catch (e) {
             console.error(`Error processing transaction ${txHash}:`, e);
           }
@@ -156,4 +222,45 @@ export function startAlchemyMonitor() {
   
   // Set up polling every 10 seconds
   setInterval(fetchLatestTransactions, 10000);
+}
+
+// Export functions to access collected data
+export function getInterestingTransactions() {
+  return interestingTransactions;
+}
+
+export function getTransactionStats() {
+  const stats = {
+    totalTransactions: interestingTransactions.length,
+    byType: {} as Record<string, number>,
+    byProtocol: {} as Record<string, number>,
+    totalValue: 0,
+    averageValue: 0
+  };
+  
+  interestingTransactions.forEach(tx => {
+    // Count by type
+    const type = tx.type || 'Unknown';
+    stats.byType[type] = (stats.byType[type] || 0) + 1;
+    
+    // Count by protocol
+    const protocol = tx.protocol || 'Unknown';
+    stats.byProtocol[protocol] = (stats.byProtocol[protocol] || 0) + 1;
+    
+    // Sum values
+    stats.totalValue += tx.usdValue || 0;
+  });
+  
+  stats.averageValue = stats.totalTransactions > 0 ? stats.totalValue / stats.totalTransactions : 0;
+  
+  return stats;
+}
+
+export function exportTransactionsToJSON() {
+  return JSON.stringify(interestingTransactions, null, 2);
+}
+
+export function clearTransactionHistory() {
+  interestingTransactions = [];
+  console.log('🗑️ Transaction history cleared');
 }
