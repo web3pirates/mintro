@@ -1,4 +1,3 @@
-// lib/noves.ts
 import axios from 'axios';
 
 const NOVES_API_KEY = process.env.NOVES_API_KEY!;

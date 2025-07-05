@@ -1,4 +1,4 @@
-// lib/alchemyListener.ts
+
 import { Alchemy, Network } from 'alchemy-sdk';
 import { decodeTxWithNoves } from './noves';
 
@@ -11,46 +11,37 @@ const settings = {
 
 const alchemy = new Alchemy(settings);
 
-// Rate limiting and filtering
 let isProcessing = false;
 let processingQueue: string[] = [];
 const MAX_CONCURRENT_REQUESTS = 1;
-const RATE_LIMIT_DELAY = 1000; // 10 seconds between batches
+
 let lastProcessedBlock = 0;
 
-// Data collection for interesting transactions
 let interestingTransactions: any[] = [];
-const MAX_STORED_TRANSACTIONS = 1000; // Keep last 1000 transactions
+const MAX_STORED_TRANSACTIONS = 1000;
 
-// Filter transactions to reduce API calls
 function shouldProcessTransaction(tx: any): boolean {
-  // Only process transactions with data (contract interactions)
   if (!tx.transaction) {
     return false;
   }
   
-  // Skip transactions with very low gas (likely simple transfers)
-  // But allow higher gas transactions that might be DeFi interactions
   if (tx.transaction.gas && parseInt(tx.transaction.gas) < 50000) {
     return false;
   }
   
-  // Skip transactions to known simple transfer contracts
   const simpleTransferContracts = [
-    '0xa0b86a33e6441b8c4c8c8c8c8c8c8c8c8c8c8c8c', // Example: skip if needed
+    '0xa0b86a33e6441b8c4c8c8c8c8c8c8c8c8c8c8c8c',
   ];
   
   if (simpleTransferContracts.includes(tx.transaction.to?.toLowerCase())) {
     return false;
   }
   
-  // Prioritize transactions with data (contract calls)
   if (tx.transaction.data && tx.transaction.data !== '0x') {
     return true;
   }
   
-  // Also process high-value transfers
-  if (tx.transaction.value && parseInt(tx.transaction.value) > 1000000000000000000) { // > 1 ETH
+  if (tx.transaction.value && parseInt(tx.transaction.value) > 1000000000000000000) {
     return true;
   }
   
@@ -77,20 +68,17 @@ async function processTransactionQueue() {
             
             if (!decoded) return;
             
-            // Extract data from Noves response
             const classificationData = decoded.classificationData;
             const rawData = decoded.rawTransactionData;
             
             if (!classificationData) return;
             
-            // Check for various interesting transaction types
             const txType = classificationData.type;
             const description = classificationData.description;
             const protocol = classificationData.protocol?.name;
             const senderAddress = classificationData.senderAddress;
             const usdValue = decoded.usd_value || 0;
             
-            // Define interesting transaction types
             const interestingTypes = [
               'swap',
               'composite'
@@ -105,7 +93,6 @@ async function processTransactionQueue() {
             
             if (!isInteresting) return;
             
-            // Extract token information if available
             const sent = classificationData.sent || [];
             const received = classificationData.received || [];
             
@@ -125,7 +112,6 @@ async function processTransactionQueue() {
             console.log(`↳ Transaction Fee: ${rawData?.transactionFee?.amount || 'Unknown'} ${rawData?.transactionFee?.token?.symbol || ''}`);
             console.log(`↳ Hash: ${txHash}\n`);
             
-            // Store interesting transaction data
             const transactionData = {
               timestamp: new Date().toISOString(),
               hash: txHash,
@@ -145,7 +131,6 @@ async function processTransactionQueue() {
             
             interestingTransactions.push(transactionData);
             
-            // Keep only the last MAX_STORED_TRANSACTIONS
             if (interestingTransactions.length > MAX_STORED_TRANSACTIONS) {
               interestingTransactions = interestingTransactions.slice(-MAX_STORED_TRANSACTIONS);
             }
@@ -156,10 +141,7 @@ async function processTransactionQueue() {
         })
       );
       
-      // Rate limiting delay
-      if (processingQueue.length > 0) {
-        await new Promise(resolve => setTimeout(resolve, RATE_LIMIT_DELAY));
-      }
+     
     } catch (e) {
       console.error('Error processing transaction batch:', e);
     }
@@ -170,17 +152,14 @@ async function processTransactionQueue() {
 
 async function fetchLatestTransactions() {
   try {
-    // Get the latest block number
     const latestBlock = await alchemy.core.getBlockNumber();
     
     if (lastProcessedBlock === 0) {
-      // First run - start from current block
       lastProcessedBlock = latestBlock;
       console.log(`🚀 Starting from block ${latestBlock}`);
       return;
     }
     
-    // Fetch transactions from blocks we haven't processed yet
     for (let blockNum = lastProcessedBlock + 1; blockNum <= latestBlock; blockNum++) {
       try {
         const block = await alchemy.core.getBlockWithTransactions(blockNum);
@@ -189,7 +168,6 @@ async function fetchLatestTransactions() {
         
         console.log(`📦 Processing block ${blockNum} with ${block.transactions.length} transactions`);
         
-        // Filter and queue transactions
         block.transactions.forEach((tx) => {
           if (shouldProcessTransaction({ transaction: tx })) {
             const txHash = tx.hash;
@@ -204,7 +182,6 @@ async function fetchLatestTransactions() {
       }
     }
     
-    // Start processing if we have transactions
     if (processingQueue.length > 0) {
       processTransactionQueue();
     }
@@ -217,14 +194,11 @@ async function fetchLatestTransactions() {
 export function startAlchemyMonitor() {
   console.log('🔌 Alchemy polling monitor ON... (every 10 seconds)');
 
-  // Initial fetch
   fetchLatestTransactions();
   
-  // Set up polling every 10 seconds
   setInterval(fetchLatestTransactions, 10000);
 }
 
-// Export functions to access collected data
 export function getInterestingTransactions() {
   return interestingTransactions;
 }
@@ -239,15 +213,12 @@ export function getTransactionStats() {
   };
   
   interestingTransactions.forEach(tx => {
-    // Count by type
     const type = tx.type || 'Unknown';
     stats.byType[type] = (stats.byType[type] || 0) + 1;
     
-    // Count by protocol
     const protocol = tx.protocol || 'Unknown';
     stats.byProtocol[protocol] = (stats.byProtocol[protocol] || 0) + 1;
     
-    // Sum values
     stats.totalValue += tx.usdValue || 0;
   });
   

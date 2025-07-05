@@ -1,4 +1,4 @@
-// Example usage of the Alchemy transaction monitor
+
 import { 
   startAlchemyMonitor, 
   getInterestingTransactions, 
@@ -7,10 +7,8 @@ import {
   clearTransactionHistory 
 } from './alchemy-listener';
 
-// Start monitoring
 startAlchemyMonitor();
 
-// Example: Check for interesting transactions every 30 seconds
 setInterval(() => {
   const transactions = getInterestingTransactions();
   const stats = getTransactionStats();
@@ -31,7 +29,7 @@ setInterval(() => {
       console.log(`  ${protocol}: ${count}`);
     });
     
-    // Show the latest transaction
+    
     const latest = transactions[transactions.length - 1];
     console.log('\n🆕 Latest Transaction:');
     console.log(`  Type: ${latest.type}`);
@@ -42,15 +40,12 @@ setInterval(() => {
   }
 }, 30000);
 
-// Example: Export data to file (you can call this manually)
 function exportData() {
   const jsonData = exportTransactionsToJSON();
   console.log('💾 Exporting transaction data...');
   console.log(jsonData);
-  // You could save this to a file or send to a database
 }
 
-// Example: Find specific types of transactions
 function findSwaps() {
   const transactions = getInterestingTransactions();
   const swaps = transactions.filter(tx => 
@@ -64,7 +59,6 @@ function findSwaps() {
   });
 }
 
-// Example: Find high-value transactions
 function findHighValueTransactions(minValue: number = 1000) {
   const transactions = getInterestingTransactions();
   const highValue = transactions.filter(tx => (tx.usdValue || 0) >= minValue);
@@ -75,7 +69,6 @@ function findHighValueTransactions(minValue: number = 1000) {
   });
 }
 
-// Example: Monitor specific addresses
 function monitorAddress(address: string) {
   const transactions = getInterestingTransactions();
   const addressTxs = transactions.filter(tx => 
@@ -88,7 +81,6 @@ function monitorAddress(address: string) {
   });
 }
 
-// Export these functions for use
 export {
   exportData,
   findSwaps,
