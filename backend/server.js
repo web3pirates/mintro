@@ -9,7 +9,16 @@ const app = express();
 
 // Middleware
 app.use(helmet());
-app.use(cors());
+app.use(cors({
+  origin: [
+    'http://localhost:3000',
+    'http://172.31.55.206:3000', // Your specific IP
+    'http://127.0.0.1:3000',
+  ],
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'Apikey']
+}));
 app.use(morgan("combined"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -39,7 +48,7 @@ mongoose
   });
 
 // Import routes with error handling
-let authRoutes, userRoutes, traderRoutes, followingRoutes;
+let authRoutes, userRoutes, traderRoutes, followingRoutes, transactionRoutes;
 
 try {
   authRoutes = require("./routes/auth");
@@ -69,6 +78,13 @@ try {
   console.error("Error loading following routes:", error.message);
 }
 
+try {
+  transactionRoutes = require("./routes/transactions");
+  console.log("Transaction routes loaded successfully");
+} catch (error) {
+  console.error("Error loading transaction routes:", error.message);
+}
+
 // Routes - only add if they loaded successfully
 if (authRoutes) {
   app.use("/api/auth", authRoutes);
@@ -84,6 +100,10 @@ if (traderRoutes) {
 
 if (followingRoutes) {
   app.use("/api/following", followingRoutes);
+}
+
+if (transactionRoutes) {
+  app.use("/api/transactions", transactionRoutes);
 }
 
 // Health check endpoint
@@ -110,9 +130,10 @@ app.use((req, res) => {
   res.status(404).json({ message: "Route not found" });
 });
 
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 5001;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
   console.log(`Health check: http://localhost:${PORT}/health`);
   console.log(`Test endpoint: http://localhost:${PORT}/api/test`);
+  console.log(`Transaction stats: http://localhost:${PORT}/api/transactions/stats`);
 });
