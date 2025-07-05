@@ -2,6 +2,7 @@
 
 import { useWorldcoinAuth } from "@/hooks/useWorldcoinAuth";
 import { Button } from "@worldcoin/mini-apps-ui-kit-react";
+import { useState, useEffect } from "react";
 
 interface SwapNotification {
   id: string;
@@ -12,6 +13,8 @@ interface SwapNotification {
   amount: string;
   token: string;
   status: "completed" | "pending" | "failed";
+  formattedDate?: string;
+  formattedTime?: string;
 }
 
 const mockSwapNotifications: SwapNotification[] = [
@@ -85,6 +88,21 @@ const getTypeIcon = (type: string) => {
 
 export const MintroBranding = () => {
   const { isLoading, isAuthenticated } = useWorldcoinAuth();
+  const [formattedNotifications, setFormattedNotifications] = useState<
+    SwapNotification[]
+  >([]);
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+    // Format dates on client side to prevent hydration mismatch
+    const formatted = mockSwapNotifications.map((notification) => ({
+      ...notification,
+      formattedDate: new Date(notification.timestamp).toLocaleDateString(),
+      formattedTime: new Date(notification.timestamp).toLocaleTimeString(),
+    }));
+    setFormattedNotifications(formatted);
+  }, []);
 
   return (
     <div className="max-w-4xl mx-auto space-y-8">
@@ -103,7 +121,7 @@ export const MintroBranding = () => {
       {/* Timeline Section */}
       <div className="space-y-6">
         <div className="space-y-4">
-          {mockSwapNotifications.map((notification) => (
+          {formattedNotifications.map((notification) => (
             <div
               key={notification.id}
               className="flex items-start gap-4 p-4 bg-white rounded-lg shadow-sm border border-gray-100"
@@ -132,8 +150,14 @@ export const MintroBranding = () => {
                 </p>
                 <div className="flex items-center justify-between text-xs text-gray-500">
                   <span>
-                    {new Date(notification.timestamp).toLocaleDateString()} •{" "}
-                    {new Date(notification.timestamp).toLocaleTimeString()}
+                    {isClient ? (
+                      <>
+                        {notification.formattedDate} •{" "}
+                        {notification.formattedTime}
+                      </>
+                    ) : (
+                      <span className="animate-pulse bg-gray-200 h-4 w-24 rounded"></span>
+                    )}
                   </span>
                   <span className="font-medium">
                     {notification.amount} → {notification.token}
