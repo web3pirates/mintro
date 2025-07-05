@@ -201,7 +201,7 @@ export const DebugInfo = () => {
                 onClick={copyToClipboard}
                 size="sm"
                 variant="secondary"
-                className="text-xs"
+                className="text-xs text-white"
               >
                 {copyStatus || "Copy Debug Info"}
               </Button>
@@ -210,7 +210,7 @@ export const DebugInfo = () => {
                   onClick={clearErrors}
                   size="sm"
                   variant="secondary"
-                  className="text-xs"
+                  className="text-xs text-white"
                 >
                   Clear Errors ({consoleErrors.length})
                 </Button>
