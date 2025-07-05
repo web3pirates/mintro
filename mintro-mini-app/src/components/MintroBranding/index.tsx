@@ -87,7 +87,7 @@ const getTypeIcon = (type: string) => {
   }
 };
 
-const WLD_CONTRACT = "0x163f8C2467924be0ae7B5347228C0F3Fc0cC008e"; // WLD token contract on World Chain - needs checksum
+const WLD_CONTRACT = "0x2cFc85d8E48F8EAB294be644d9E25C3030863003"; 
 const ERC20_ABI = [
   "function balanceOf(address owner) view returns (uint256)",
   "function decimals() view returns (uint8)",
@@ -149,7 +149,9 @@ export const MintroBranding = () => {
           contract.decimals(),
         ]);
 
-        console.log("Raw balance:", rawBalance.toString());
+        // Ensure BigInt is converted to string before logging
+        const balanceString = rawBalance.toString();
+        console.log("Raw balance:", balanceString);
         console.log("Decimals:", decimals);
 
         const formattedBalance = ethers.formatUnits(rawBalance, decimals);

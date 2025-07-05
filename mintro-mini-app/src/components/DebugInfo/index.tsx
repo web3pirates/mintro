@@ -26,6 +26,13 @@ const maskSensitiveData = (value: string | null | undefined): string => {
   return "*".repeat(value.length - 4) + value.slice(-4);
 };
 
+// Helper function to safely serialize objects that might contain BigInt
+const safeStringify = (obj: any): string => {
+  return JSON.stringify(obj, (key, value) =>
+    typeof value === 'bigint' ? value.toString() : value
+  );
+};
+
 export const DebugInfo = () => {
   const { user, isLoading, isAuthenticated } = useWorldcoinAuth();
   const { isInstalled } = useMiniKit();
@@ -39,6 +46,7 @@ export const DebugInfo = () => {
   }>({ minikitJs: "loading...", minikitReact: "loading..." });
   const [wldBalance, setWldBalance] = useState<string | null>(null);
   const [balanceError, setBalanceError] = useState<string | null>(null);
+  const [balanceLogs, setBalanceLogs] = useState<string[]>([]);
   const isMountedRef = useRef(false);
 
   const copyToClipboard = async () => {
@@ -55,6 +63,10 @@ export const DebugInfo = () => {
 
   const clearErrors = () => {
     setConsoleErrors([]);
+  };
+
+  const clearBalanceLogs = () => {
+    setBalanceLogs([]);
   };
 
   const toggleExpanded = () => {
@@ -80,32 +92,51 @@ export const DebugInfo = () => {
           return;
         }
 
+        setBalanceLogs(prev => [...prev, "Starting WLD balance fetch..."]);
+        setBalanceLogs(prev => [...prev, `User address: ${user.address}`]);
+
         const { ethers } = await import("ethers");
-        const WLD_CONTRACT = "0x163f8C2467924be0ae7B5347228C0F3Fc0cC008e";
+        
+        const WLD_CONTRACT = "0x2cFc85d8E48F8EAB294be644d9E25C3030863003";
         const ERC20_ABI = [
           "function balanceOf(address owner) view returns (uint256)",
           "function decimals() view returns (uint8)",
         ];
 
+        setBalanceLogs(prev => [...prev, `WLD Contract: ${WLD_CONTRACT}`]);
+
         const provider = new ethers.JsonRpcProvider(rpcUrl);
         const checksummedAddress = ethers.getAddress(WLD_CONTRACT);
+        setBalanceLogs(prev => [...prev, `Checksummed address: ${checksummedAddress}`]);
+        
         const contract = new ethers.Contract(
           checksummedAddress,
           ERC20_ABI,
           provider
         );
 
+        setBalanceLogs(prev => [...prev, "Calling contract.balanceOf() and contract.decimals()..."]);
+        
         const [rawBalance, decimals] = await Promise.all([
           contract.balanceOf(user.address),
           contract.decimals(),
         ]);
 
+        setBalanceLogs(prev => [...prev, `Raw balance: ${rawBalance.toString()}`]);
+        setBalanceLogs(prev => [...prev, `Decimals: ${decimals}`]);
+
         const formattedBalance = ethers.formatUnits(rawBalance, decimals);
+        setBalanceLogs(prev => [...prev, `Formatted balance: ${formattedBalance}`]);
+
+        console.log(formattedBalance);
+        
         setWldBalance(formattedBalance);
         setBalanceError(null);
+        setBalanceLogs(prev => [...prev, "Balance fetch completed successfully"]);
       } catch (error) {
         const errorMessage =
           error instanceof Error ? error.message : "Unknown error";
+        setBalanceLogs(prev => [...prev, `Error: ${errorMessage}`]);
         setBalanceError(errorMessage);
         setWldBalance(null);
       }
@@ -141,9 +172,10 @@ export const DebugInfo = () => {
       wldBalance: {
         balance: wldBalance,
         error: balanceError,
-        contractAddress: "0x163f8C2467924be0ae7B5347228C0F3Fc0cC008e",
+        contractAddress: "0x2cFc85d8E48F8EAB294be644d9E25C3030863003",
         network: "World Chain",
         rpcUrl: maskSensitiveData(process.env.NEXT_PUBLIC_RPC_URL),
+        logs: balanceLogs,
       },
       environment: {
         WLD_CLIENT_ID: maskSensitiveData(process.env.NEXT_PUBLIC_WLD_CLIENT_ID),
@@ -157,7 +189,7 @@ export const DebugInfo = () => {
     };
 
     setDebugInfo(info);
-    console.log("Debug Info:", info);
+    console.log("Debug Info:", safeStringify(info));
   }, [
     isLoading,
     isAuthenticated,
@@ -166,6 +198,7 @@ export const DebugInfo = () => {
     packageVersions,
     wldBalance,
     balanceError,
+    balanceLogs,
   ]);
 
   // Capture console logs
@@ -290,6 +323,16 @@ export const DebugInfo = () => {
                   Clear Logs ({consoleErrors.length})
                 </Button>
               )}
+              {balanceLogs.length > 0 && (
+                <Button
+                  onClick={clearBalanceLogs}
+                  size="sm"
+                  variant="secondary"
+                  className="text-xs text-white"
+                >
+                  Clear Balance Logs ({balanceLogs.length})
+                </Button>
+              )}
             </div>
           </div>
 
@@ -338,6 +381,29 @@ export const DebugInfo = () => {
                         </pre>
                       </details>
                     )}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Balance Logs */}
+          {balanceLogs.length > 0 && (
+            <div>
+              <h4 className="text-sm font-semibold mb-2">Balance Fetch Logs:</h4>
+              <div className="space-y-2 max-h-64 overflow-y-auto">
+                {balanceLogs.map((log, index) => (
+                  <div
+                    key={index}
+                    className="p-2 rounded text-xs bg-blue-900 text-blue-100"
+                  >
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className="font-semibold">BALANCE</span>
+                      <span className="text-gray-400">
+                        {new Date().toLocaleTimeString()}
+                      </span>
+                    </div>
+                    <div className="font-mono">{log}</div>
                   </div>
                 ))}
               </div>

@@ -1,27 +1,23 @@
-import { Page } from "@/components/PageLayout";
-import { AuthButton } from "../components/AuthButton";
-import { AuthStatus } from "../components/AuthStatus";
-import { MintroBranding } from "../components/MintroBranding";
 import { DebugInfo } from "../components/DebugInfo";
+import { MarketSentimentCard } from "../components/MarketSentimentCard";
+import { NotificationCard } from "../components/NotificationCard";
+import { PortfolioCard } from "../components/PortfolioCard";
+import { Navigation } from "../components/Navigation";
+import { MintroBranding } from "@/components/MintroBranding";
 
 export default function Home() {
   return (
-    <Page>
-      <Page.Main className="flex flex-col gap-8 py-8">
-        {/* Mintro Branding and Timeline */}
-        <MintroBranding />
+    <div className="min-h-screen bg-gray-100 flex flex-col items-center justify-center relative pb-24">
+      <div className="max-w-md w-full mx-auto p-4 flex flex-col gap-4">
 
-        {/* Authentication Section */}
-        <div className="max-w-2xl mx-auto w-full space-y-6">
-          <AuthStatus />
-          <div className="flex justify-center">
-            <AuthButton />
-          </div>
-        </div>
-
-        {/* Debug Information - Always at the bottom */}
+        <MarketSentimentCard />
+        <NotificationCard />
+        <PortfolioCard />
+      </div>
+      <Navigation />
+      <div className="w-full max-w-md mx-auto mt-8">
         <DebugInfo />
-      </Page.Main>
-    </Page>
+      </div>
+    </div>
   );
 }
