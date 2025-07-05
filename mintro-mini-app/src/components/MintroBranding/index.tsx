@@ -87,7 +87,7 @@ const getTypeIcon = (type: string) => {
   }
 };
 
-const WLD_CONTRACT = "0xA6d1E7A6aB7e8e1e6e4B6e6e6e6e6e6e6e6e6e6e"; // Replace with actual WLD address
+const WLD_CONTRACT = "0x163f8C2467924be0ae7B5347228C0F3Fc0cC008e"; // WLD token contract on World Chain
 const ERC20_ABI = [
   "function balanceOf(address owner) view returns (uint256)",
   "function decimals() view returns (uint8)",
@@ -100,6 +100,8 @@ export const MintroBranding = () => {
   >([]);
   const [isClient, setIsClient] = useState(false);
   const [wldBalance, setWldBalance] = useState<string | null>(null);
+  const [balanceError, setBalanceError] = useState<string | null>(null);
+  const [debugLogs, setDebugLogs] = useState<string[]>([]);
 
   useEffect(() => {
     setIsClient(true);
@@ -114,15 +116,67 @@ export const MintroBranding = () => {
 
   useEffect(() => {
     async function fetchWldBalance() {
-      if (!user?.address) return;
-      const provider = new ethers.JsonRpcProvider(process.env.NEXT_PUBLIC_RPC_URL);
-      const contract = new ethers.Contract(WLD_CONTRACT, ERC20_ABI, provider);
-      const [rawBalance, decimals] = await Promise.all([
-        contract.balanceOf(user.address),
-        contract.decimals(),
-      ]);
-      setWldBalance(ethers.formatUnits(rawBalance, decimals));
+      if (!user?.address) {
+        setDebugLogs((prev) => [...prev, "No user address available"]);
+        return;
+      }
+
+      try {
+        setDebugLogs((prev) => [
+          ...prev,
+          `Fetching WLD balance for address: ${user.address}`,
+        ]);
+
+        // Check if RPC URL is available
+        const rpcUrl = process.env.NEXT_PUBLIC_RPC_URL;
+        if (!rpcUrl) {
+          throw new Error(
+            "NEXT_PUBLIC_RPC_URL environment variable is not set"
+          );
+        }
+
+        setDebugLogs((prev) => [...prev, `Using RPC URL: ${rpcUrl}`]);
+        setDebugLogs((prev) => [
+          ...prev,
+          `Network: World Chain (Worldcoin's blockchain)`,
+        ]);
+
+        const provider = new ethers.JsonRpcProvider(rpcUrl);
+        const contract = new ethers.Contract(WLD_CONTRACT, ERC20_ABI, provider);
+
+        setDebugLogs((prev) => [...prev, `Contract address: ${WLD_CONTRACT}`]);
+
+        const [rawBalance, decimals] = await Promise.all([
+          contract.balanceOf(user.address),
+          contract.decimals(),
+        ]);
+
+        setDebugLogs((prev) => [
+          ...prev,
+          `Raw balance: ${rawBalance.toString()}`,
+        ]);
+        setDebugLogs((prev) => [...prev, `Decimals: ${decimals}`]);
+
+        const formattedBalance = ethers.formatUnits(rawBalance, decimals);
+        setDebugLogs((prev) => [
+          ...prev,
+          `Formatted balance: ${formattedBalance}`,
+        ]);
+
+        setWldBalance(formattedBalance);
+        setBalanceError(null);
+      } catch (error) {
+        const errorMessage =
+          error instanceof Error ? error.message : "Unknown error";
+        setDebugLogs((prev) => [
+          ...prev,
+          `Error fetching WLD balance: ${errorMessage}`,
+        ]);
+        setBalanceError(errorMessage);
+        setWldBalance(null);
+      }
     }
+
     fetchWldBalance();
   }, [user?.address]);
 
@@ -134,9 +188,9 @@ export const MintroBranding = () => {
           <h1 className="text-4xl md:text-6xl bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
             Mintro
           </h1>
-          <p className="text-xl md:text-2xl text-white max-w-3xl mx-auto">
-            Your intelligent DeFi companion v0.10
-          </p>
+          <h3 className="text-lg font-semibold">
+            Your intelligent DeFi companion v0.11
+          </h3>
         </div>
       </div>
 
@@ -200,8 +254,33 @@ export const MintroBranding = () => {
         ) : isAuthenticated ? (
           <div className="space-y-4">
             {wldBalance !== null && (
-              <div>
+              <div className="text-white">
                 <strong>WLD Balance:</strong> {wldBalance}
+              </div>
+            )}
+            {balanceError && (
+              <div className="text-red-400 text-sm">
+                <strong>Error fetching balance:</strong> {balanceError}
+              </div>
+            )}
+            <div className="text-white text-sm">
+              <strong>User Address:</strong> {user?.address}
+            </div>
+
+            {/* Debug Info Section */}
+            {debugLogs.length > 0 && (
+              <div className="mt-6 p-4 bg-gray-800 rounded-lg">
+                <h3 className="text-white font-semibold mb-2">Debug Info:</h3>
+                <div className="space-y-1">
+                  {debugLogs.map((log, index) => (
+                    <div
+                      key={index}
+                      className="text-green-400 text-xs font-mono"
+                    >
+                      {log}
+                    </div>
+                  ))}
+                </div>
               </div>
             )}
           </div>
