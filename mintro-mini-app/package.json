@@ -38,5 +38,12 @@
     "eslint-config-next": "15.2.3",
     "tailwindcss": "^4",
     "typescript": "^5"
+  },
+  "resolutions": {
+    "@walletconnect/core": "2.21.3",
+    "@walletconnect/sign-client": "2.21.3",
+    "@walletconnect/types": "2.21.3",
+    "@walletconnect/utils": "2.21.3",
+    "@walletconnect/universal-provider": "2.21.3"
   }
 }
