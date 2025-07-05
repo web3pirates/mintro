@@ -80,8 +80,8 @@ export const AuthButton = () => {
         })
       );
 
-      // Redirect to home page
-      router.push("/home");
+      // Redirect to protected home page
+      router.push("/protected/home");
     } catch (error) {
       console.error("Worldcoin wallet authentication error", error);
     } finally {
