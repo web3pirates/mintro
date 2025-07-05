@@ -1,6 +1,6 @@
 "use client";
 
-import { useSession } from "next-auth/react";
+import { useWorldcoinAuth } from "@/hooks/useWorldcoinAuth";
 import { useMiniKit } from "@worldcoin/minikit-js/minikit-provider";
 import { MiniKit } from "@worldcoin/minikit-js";
 import { useEffect, useState } from "react";
@@ -13,7 +13,7 @@ interface UserInfo {
 }
 
 export const UserInfo = () => {
-  const { data: session, status } = useSession();
+  const { user, isLoading, isAuthenticated } = useWorldcoinAuth();
   const { isInstalled } = useMiniKit();
   const [worldcoinUserInfo, setWorldcoinUserInfo] = useState<UserInfo | null>(
     null
@@ -21,14 +21,12 @@ export const UserInfo = () => {
 
   useEffect(() => {
     const fetchWorldcoinUserInfo = async () => {
-      if (session?.user?.walletAddress && isInstalled) {
+      if (isAuthenticated && user?.address && isInstalled) {
         try {
           // Access the user's worldcoin information and wallet data
-          const userInfo = await MiniKit.getUserByAddress(
-            session.user.walletAddress
-          );
+          const userInfo = await MiniKit.getUserByAddress(user.address);
           setWorldcoinUserInfo({
-            address: session.user.walletAddress,
+            address: user.address,
             username: userInfo?.username,
             profilePictureUrl: userInfo?.profilePictureUrl,
           });
@@ -39,9 +37,9 @@ export const UserInfo = () => {
     };
 
     fetchWorldcoinUserInfo();
-  }, [session?.user?.walletAddress, isInstalled]);
+  }, [isAuthenticated, user?.address, isInstalled]);
 
-  if (status === "loading") {
+  if (isLoading) {
     return (
       <div className="p-4 bg-gray-100 rounded-lg">
         <p className="text-gray-600">Loading user information...</p>
@@ -49,7 +47,7 @@ export const UserInfo = () => {
     );
   }
 
-  if (!session) {
+  if (!isAuthenticated) {
     return (
       <div className="p-4 bg-gray-100 rounded-lg">
         <p className="text-gray-600">Please log in to see your information</p>
@@ -63,11 +61,11 @@ export const UserInfo = () => {
 
       <div className="space-y-3">
         <div>
-          <strong>Username:</strong> {session.user.username}
+          <strong>Username:</strong> {user?.username || "Not set"}
         </div>
 
         <div>
-          <strong>Wallet Address:</strong> {session.user.walletAddress}
+          <strong>Wallet Address:</strong> {user?.address}
         </div>
 
         {worldcoinUserInfo && (

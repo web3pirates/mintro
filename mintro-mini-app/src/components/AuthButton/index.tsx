@@ -1,8 +1,9 @@
 "use client";
 import { Button, LiveFeedback } from "@worldcoin/mini-apps-ui-kit-react";
 import { useMiniKit } from "@worldcoin/minikit-js/minikit-provider";
+import { MiniKit } from "@worldcoin/minikit-js";
 import { useCallback, useState } from "react";
-import { walletAuth } from "@/auth/wallet";
+import { useRouter } from "next/navigation";
 
 /**
  * This component uses Worldcoin Mini App native wallet authentication
@@ -11,6 +12,7 @@ import { walletAuth } from "@/auth/wallet";
 export const AuthButton = () => {
   const [isPending, setIsPending] = useState(false);
   const { isInstalled } = useMiniKit();
+  const router = useRouter();
 
   // Debug logging
   console.log("AuthButton Debug Info:", {
@@ -39,15 +41,53 @@ export const AuthButton = () => {
     console.log("Starting Worldcoin wallet authentication...");
     setIsPending(true);
     try {
-      // Use the native Worldcoin wallet authentication
-      await walletAuth();
+      // Use the native Worldcoin wallet authentication directly
+      const result = await MiniKit.commandsAsync.walletAuth({
+        nonce: crypto.randomUUID().replace(/-/g, ""),
+        expirationTime: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+        notBefore: new Date(Date.now() - 24 * 60 * 60 * 1000),
+        statement: `Authenticate with Mintro DeFi App (${crypto
+          .randomUUID()
+          .replace(/-/g, "")}).`,
+      });
+
+      console.log("Wallet auth result:", result);
+
+      if (!result) {
+        throw new Error("No response from wallet auth");
+      }
+
+      if (result.finalPayload.status !== "success") {
+        console.error(
+          "Wallet authentication failed",
+          result.finalPayload.error_code
+        );
+        throw new Error(
+          `Authentication failed: ${result.finalPayload.error_code}`
+        );
+      }
+
       console.log("Successfully authenticated with Worldcoin wallet");
+      console.log("Final payload:", result.finalPayload);
+
+      // Store the authentication data in localStorage for session management
+      localStorage.setItem(
+        "worldcoin_auth",
+        JSON.stringify({
+          address: result.finalPayload.address,
+          timestamp: Date.now(),
+          payload: result.finalPayload,
+        })
+      );
+
+      // Redirect to home page
+      router.push("/home");
     } catch (error) {
       console.error("Worldcoin wallet authentication error", error);
     } finally {
       setIsPending(false);
     }
-  }, [isInstalled, isPending]);
+  }, [isInstalled, isPending, router]);
 
   return (
     <div className="space-y-4">

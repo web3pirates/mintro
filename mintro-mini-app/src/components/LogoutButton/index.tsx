@@ -1,15 +1,17 @@
 "use client";
 
 import { Button } from "@worldcoin/mini-apps-ui-kit-react";
-import { signOut } from "next-auth/react";
+import { useWorldcoinAuth } from "@/hooks/useWorldcoinAuth";
 import { useRouter } from "next/navigation";
 
 export const LogoutButton = () => {
+  const { logout } = useWorldcoinAuth();
   const router = useRouter();
 
   const handleLogout = async () => {
     try {
-      await signOut({ callbackUrl: "/" });
+      logout();
+      router.push("/");
     } catch (error) {
       console.error("Logout error:", error);
     }

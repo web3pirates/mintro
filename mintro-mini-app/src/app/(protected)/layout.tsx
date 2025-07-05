@@ -1,18 +1,43 @@
-import { auth } from '@/auth';
-import { Navigation } from '@/components/Navigation';
-import { Page } from '@/components/PageLayout';
+"use client";
 
-export default async function TabsLayout({
+import { useWorldcoinAuth } from "@/hooks/useWorldcoinAuth";
+import { Navigation } from "@/components/Navigation";
+import { Page } from "@/components/PageLayout";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
+
+export default function TabsLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const session = await auth();
+  const { isAuthenticated, isLoading } = useWorldcoinAuth();
+  const router = useRouter();
 
-  // If the user is not authenticated, redirect to the login page
-  if (!session) {
-    console.log('Not authenticated');
-    // redirect('/');
+  // If the user is not authenticated and not loading, redirect to the login page
+  useEffect(() => {
+    if (!isLoading && !isAuthenticated) {
+      console.log("Not authenticated, redirecting to login");
+      router.push("/");
+    }
+  }, [isAuthenticated, isLoading, router]);
+
+  // Show loading while checking authentication
+  if (isLoading) {
+    return (
+      <Page>
+        <Page.Main className="flex items-center justify-center">
+          <div className="text-center">
+            <p className="text-lg">Loading...</p>
+          </div>
+        </Page.Main>
+      </Page>
+    );
+  }
+
+  // Don't render protected content if not authenticated
+  if (!isAuthenticated) {
+    return null;
   }
 
   return (

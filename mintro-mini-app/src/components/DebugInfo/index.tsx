@@ -1,6 +1,6 @@
 "use client";
 
-import { usePrivy } from "@privy-io/react-auth";
+import { useWorldcoinAuth } from "@/hooks/useWorldcoinAuth";
 import { useMiniKit } from "@worldcoin/minikit-js/minikit-provider";
 import { useEffect, useState, useRef } from "react";
 import { Button } from "@worldcoin/mini-apps-ui-kit-react";
@@ -27,7 +27,7 @@ const maskSensitiveData = (value: string | null | undefined): string => {
 };
 
 export const DebugInfo = () => {
-  const { user, authenticated, ready } = usePrivy();
+  const { user, isLoading, isAuthenticated } = useWorldcoinAuth();
   const { isInstalled } = useMiniKit();
   const [debugInfo, setDebugInfo] = useState<Record<string, unknown>>({});
   const [copyStatus, setCopyStatus] = useState<string>("");
@@ -74,14 +74,13 @@ export const DebugInfo = () => {
 
   useEffect(() => {
     const info = {
-      privy: {
-        ready,
-        authenticated,
+      worldcoinAuth: {
+        isLoading,
+        isAuthenticated,
         user: user
           ? {
-              id: maskSensitiveData(user.id),
-              walletAddress: maskSensitiveData(user.wallet?.address),
-              linkedAccounts: user.linkedAccounts?.length || 0,
+              username: user.username,
+              walletAddress: maskSensitiveData(user.address),
             }
           : null,
       },
@@ -91,7 +90,6 @@ export const DebugInfo = () => {
       },
       environment: {
         WLD_CLIENT_ID: maskSensitiveData(process.env.NEXT_PUBLIC_WLD_CLIENT_ID),
-        PRIVY_APP_ID: maskSensitiveData(process.env.NEXT_PUBLIC_PRIVY_APP_ID),
         NODE_ENV: process.env.NODE_ENV,
       },
       window: {
@@ -103,7 +101,7 @@ export const DebugInfo = () => {
 
     setDebugInfo(info);
     console.log("Debug Info:", info);
-  }, [ready, authenticated, user, isInstalled]);
+  }, [isLoading, isAuthenticated, user, isInstalled, packageVersions]);
 
   // Capture console errors
   useEffect(() => {
@@ -200,43 +198,48 @@ export const DebugInfo = () => {
           <div className="flex items-center justify-between mb-4 pt-4">
             <div className="flex items-center gap-2">
               <Button
-                onClick={clearErrors}
-                size="sm"
-                variant="secondary"
-                className="text-xs text-white"
-              >
-                Clear Errors
-              </Button>
-              <Button
                 onClick={copyToClipboard}
                 size="sm"
                 variant="secondary"
                 className="text-xs text-white"
               >
-                Copy All
+                {copyStatus || "Copy Debug Info"}
               </Button>
-              {copyStatus && (
-                <span className="text-xs text-green-400">{copyStatus}</span>
+              {consoleErrors.length > 0 && (
+                <Button
+                  onClick={clearErrors}
+                  size="sm"
+                  variant="secondary"
+                  className="text-xs text-white"
+                >
+                  Clear Errors ({consoleErrors.length})
+                </Button>
               )}
             </div>
           </div>
 
-          {/* Console Errors Section */}
+          {/* Debug Info */}
+          <div className="mb-4">
+            <h4 className="text-sm font-semibold mb-2">Debug Info:</h4>
+            <pre className="bg-gray-800 p-3 rounded text-xs overflow-x-auto">
+              {JSON.stringify(debugInfo, null, 2)}
+            </pre>
+          </div>
+
+          {/* Console Errors */}
           {consoleErrors.length > 0 && (
-            <div className="mb-4">
-              <h4 className="text-md font-semibold mb-2 text-red-400">
-                Console Errors ({consoleErrors.length})
-              </h4>
-              <div className="space-y-2 max-h-40 overflow-y-auto">
+            <div>
+              <h4 className="text-sm font-semibold mb-2">Console Errors:</h4>
+              <div className="space-y-2 max-h-64 overflow-y-auto">
                 {consoleErrors.map((error, index) => (
                   <div
                     key={index}
                     className={`p-2 rounded text-xs ${
                       error.type === "error"
-                        ? "bg-red-900 text-red-200"
+                        ? "bg-red-900 text-red-100"
                         : error.type === "warn"
-                        ? "bg-yellow-900 text-yellow-200"
-                        : "bg-blue-900 text-blue-200"
+                        ? "bg-yellow-900 text-yellow-100"
+                        : "bg-blue-900 text-blue-100"
                     }`}
                   >
                     <div className="flex items-center gap-2 mb-1">
@@ -253,7 +256,7 @@ export const DebugInfo = () => {
                         <summary className="cursor-pointer text-gray-400">
                           Stack trace
                         </summary>
-                        <pre className="text-xs mt-1 text-gray-300 whitespace-pre-wrap">
+                        <pre className="mt-1 text-xs text-gray-300 whitespace-pre-wrap">
                           {error.stack}
                         </pre>
                       </details>
@@ -263,14 +266,6 @@ export const DebugInfo = () => {
               </div>
             </div>
           )}
-
-          {/* Debug Info Section */}
-          <div>
-            <h4 className="text-md font-semibold mb-2">System Information</h4>
-            <pre className="whitespace-pre-wrap overflow-auto">
-              {JSON.stringify(debugInfo, null, 2)}
-            </pre>
-          </div>
         </div>
       )}
     </div>
