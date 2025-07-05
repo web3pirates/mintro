@@ -19,6 +19,7 @@
     "@worldcoin/minikit-js": "^1.9.6",
     "@worldcoin/minikit-react": "1.9.6",
     "clsx": "^2.1.1",
+    "ethers": "^6.15.0",
     "iconoir-react": "^7.11.0",
     "next": "15.2.3",
     "next-auth": "^5.0.0-beta.25",

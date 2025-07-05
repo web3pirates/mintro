@@ -3,6 +3,7 @@
 import { useWorldcoinAuth } from "@/hooks/useWorldcoinAuth";
 import { Button } from "@worldcoin/mini-apps-ui-kit-react";
 import { useState, useEffect } from "react";
+import { ethers } from "ethers";
 
 interface SwapNotification {
   id: string;
@@ -86,12 +87,19 @@ const getTypeIcon = (type: string) => {
   }
 };
 
+const WLD_CONTRACT = "0xA6d1E7A6aB7e8e1e6e4B6e6e6e6e6e6e6e6e6e6e"; // Replace with actual WLD address
+const ERC20_ABI = [
+  "function balanceOf(address owner) view returns (uint256)",
+  "function decimals() view returns (uint8)",
+];
+
 export const MintroBranding = () => {
-  const { isLoading, isAuthenticated } = useWorldcoinAuth();
+  const { isLoading, isAuthenticated, user } = useWorldcoinAuth();
   const [formattedNotifications, setFormattedNotifications] = useState<
     SwapNotification[]
   >([]);
   const [isClient, setIsClient] = useState(false);
+  const [wldBalance, setWldBalance] = useState<string | null>(null);
 
   useEffect(() => {
     setIsClient(true);
@@ -104,6 +112,20 @@ export const MintroBranding = () => {
     setFormattedNotifications(formatted);
   }, []);
 
+  useEffect(() => {
+    async function fetchWldBalance() {
+      if (!user?.address) return;
+      const provider = new ethers.JsonRpcProvider(process.env.NEXT_PUBLIC_RPC_URL);
+      const contract = new ethers.Contract(WLD_CONTRACT, ERC20_ABI, provider);
+      const [rawBalance, decimals] = await Promise.all([
+        contract.balanceOf(user.address),
+        contract.decimals(),
+      ]);
+      setWldBalance(ethers.formatUnits(rawBalance, decimals));
+    }
+    fetchWldBalance();
+  }, [user?.address]);
+
   return (
     <div className="max-w-4xl mx-auto space-y-8">
       {/* Hero Section */}
@@ -113,7 +135,7 @@ export const MintroBranding = () => {
             Mintro
           </h1>
           <p className="text-xl md:text-2xl text-white max-w-3xl mx-auto">
-            Your intelligent DeFi companion v0.9
+            Your intelligent DeFi companion v0.10
           </p>
         </div>
       </div>
@@ -176,7 +198,13 @@ export const MintroBranding = () => {
             <p className="text-white">Loading...</p>
           </div>
         ) : isAuthenticated ? (
-          <div className="space-y-4"></div>
+          <div className="space-y-4">
+            {wldBalance !== null && (
+              <div>
+                <strong>WLD Balance:</strong> {wldBalance}
+              </div>
+            )}
+          </div>
         ) : (
           <div className="space-y-4">
             <Button size="lg" variant="primary" className="px-8">
