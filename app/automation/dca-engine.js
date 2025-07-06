@@ -37,6 +37,7 @@ const memecoinTokens = {
 
 // Router config
 const routerAbi = require("./abi/UniswapV2Router02.json");
+const smartWalletAbi = require("./abi/SmartWalletAbi.json");
 const router = new web3.eth.Contract(routerAbi, process.env.ROUTER_ADDRESS);
 
 // Amount to allocate
@@ -49,7 +50,6 @@ async function tradeUSDCtoToken(tokenAddress, amountInUSDC, userSmartWalletAddre
   const amountIn = web3.utils.toWei(amountInUSDC.toString(), "mwei"); // USDC = 6 decimals
   const amountOutMin = 0;
 
-  const smartWalletAbi = require("./abi/SmartWalletAbi.json");
   const smartWallet = new web3.eth.Contract(smartWalletAbi, userSmartWalletAddress);
 
   console.log("\n========== 🚀 Executing performSwapV2 ==========");

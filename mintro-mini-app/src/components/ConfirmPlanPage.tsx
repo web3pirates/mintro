@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { FaBitcoin, FaEthereum } from "react-icons/fa";
 
 const WorldcoinIcon = () => (
@@ -125,6 +125,32 @@ function SummaryText({
   );
 }
 
+function SuccessPopup({ isVisible, onClose }: { isVisible: boolean; onClose: () => void }) {
+  if (!isVisible) return null;
+
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+      <div className="bg-white rounded-2xl p-8 max-w-sm w-full text-center shadow-2xl animate-in fade-in duration-300">
+        <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+          <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+          </svg>
+        </div>
+        <h3 className="text-xl font-bold text-gray-900 mb-2">Plan Confirmed!</h3>
+        <p className="text-gray-600 mb-6">
+          Your investment plan has been successfully created. We'll start managing your portfolio right away.
+        </p>
+        <button
+          onClick={onClose}
+          className="w-full bg-purple-600 text-white font-semibold py-3 px-6 rounded-xl hover:bg-purple-700 transition-colors"
+        >
+          Got it
+        </button>
+      </div>
+    </div>
+  );
+}
+
 export default function ConfirmPlanPage({
   allocations,
   amount,
@@ -138,6 +164,19 @@ export default function ConfirmPlanPage({
   onBack?: () => void;
   onConfirm?: () => void;
 }) {
+  const [showSuccess, setShowSuccess] = useState(false);
+
+  const handleConfirm = () => {
+    setShowSuccess(true);
+    if (onConfirm) {
+      onConfirm();
+    }
+  };
+
+  const handleCloseSuccess = () => {
+    setShowSuccess(false);
+  };
+
   return (
     <div className="min-h-screen bg-white flex flex-col relative px-4 pb-8">
       <button className="absolute left-4 top-6 text-2xl z-10" onClick={onBack}>
@@ -155,11 +194,12 @@ export default function ConfirmPlanPage({
         <SummaryText amount={amount} frequency={frequency} />
         <button
           className="w-full rounded-xl !bg-purple-600 !text-white font-bold text-xl !py-3 mt-auto !shadow-md hover:bg-purple-800 transition"
-          onClick={onConfirm}
+          onClick={handleConfirm}
         >
           Confirm
         </button>
       </div>
+      <SuccessPopup isVisible={showSuccess} onClose={handleCloseSuccess} />
     </div>
   );
 }
