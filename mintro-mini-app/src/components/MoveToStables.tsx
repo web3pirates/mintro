@@ -56,6 +56,7 @@ export const MoveToStables = () => {
   );
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [showSuccessScreen, setShowSuccessScreen] = useState(false);
 
   useEffect(() => {
     const fetchSentimentData = async () => {
@@ -112,6 +113,47 @@ export const MoveToStables = () => {
     );
   }
 
+  if (showSuccessScreen) {
+    return (
+      <div className="fixed inset-0 bg-white flex flex-col items-center justify-center z-50">
+        <div className="flex flex-col items-center">
+          <div className="bg-green-500 rounded-full p-6 mb-6">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="12" cy="12" r="12" fill="#22C55E" />
+              <path d="M7 13l3 3 7-7" stroke="#fff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          </div>
+          <div className="text-3xl font-extrabold text-neutral-800 text-center mb-2">
+            You've moved to stables
+          </div>
+          <div className="text-gray-500 text-center mb-6">
+            Phew. Your funds are now in USDC.<br />Time to relax!
+          </div>
+
+          {/* APY Card */}
+          <div className="bg-white rounded-xl p-6 mb-4 flex flex-col items-center shadow-md w-full max-w-xs">
+            <span role="img" aria-label="money bag" className="text-3xl mb-2">💰</span>
+            <div className="font-bold text-lg mb-1">Earning Yield</div>
+            <div className="text-black text-base text-center">
+              Now earning <span className="font-bold">20.64% APY</span> on<br />Uniswap V3 (WLD/USDC pool)
+            </div>
+          </div>
+
+          <div className="bg-gray-50 rounded-xl p-4 mb-4 flex items-center gap-2">
+            <span role="img" aria-label="bell" className="text-2xl">🔔</span>
+            <span className="text-gray-700 text-sm">We'll notify you when sentiment improves so you can redeploy.</span>
+          </div>
+          <button
+            className="mt-4 bg-purple-700 text-white px-8 py-3 rounded-xl text-lg font-semibold shadow-md hover:bg-purple-800 transition"
+            onClick={() => window.location.href = "/"}
+          >
+            Back to Home
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   const handleMoveToStables = async () => {
     console.log("Moving to stables plan");
     const res = await fetch("/api/emergency-sell", {
@@ -119,12 +161,20 @@ export const MoveToStables = () => {
     });
     const data = await res.json();
 
-    if (data.success) {
+    if (data) {
       const liquidityProvidingRes = await fetch("/api/liquidity-providing", {
         method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ userAddress: "0xe5C7EcB768BAD679d6392F42c40693F11d8C1e56" }),
       });
       const liquidityProvidingData = await liquidityProvidingRes.json();
       console.log("Liquidity providing response", liquidityProvidingData);
+      // If no error, show success screen
+      if (!liquidityProvidingData.error) {
+        setShowSuccessScreen(true);
+      }
     } else {
       console.log("Emergency sell failed");
     }
