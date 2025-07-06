@@ -359,7 +359,7 @@ export const MarketSentimentCard = () => {
         )}
       </div>
 
-      <p className="flex items-center gap-1">
+      <p className="flex items-center gap-1 mb-2">
         {trendDetails.change > 0 ? (
           <ImArrowUp className="text-green-600 text-lg align-middle -mt-1" />
         ) : trendDetails.change < 0 ? (
