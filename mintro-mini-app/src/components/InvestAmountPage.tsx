@@ -195,7 +195,7 @@ export default function InvestAmountPage({
           className="w-full rounded-xl !bg-purple-600 !text-white font-bold text-xl !py-3 mt-4 !shadow-md hover:bg-purple-800 transition"
           onClick={handleRampFunds}
         >
-          {isRamping ? "Opening..." : "Ramp funds"}
+          {isRamping ? "Opening..." : "OnRamp funds"}
         </button>
       </div>
     </div>
