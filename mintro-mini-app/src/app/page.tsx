@@ -8,15 +8,17 @@ import { MintroBranding } from "@/components/MintroBranding";
 import AdjustPortfolioPage from "../components/AdjustPortfolioPage";
 import InvestAmountPage from "../components/InvestAmountPage";
 import ConfirmPlanPage from "@/components/ConfirmPlanPage";
+import PlanSuccessPage from "@/components/PlanSuccessPage";
 import { WalletBalance } from "@/components/WalletBalance";
 import { Navigation } from "@/components/Navigation";
 import { MoveToStables } from "@/components/MoveToStables";
 
 export default function Home() {
-  const [screen, setScreen] = useState<"main" | "adjust" | "invest" | "confirm" | "balance">("main");
+  const [screen, setScreen] = useState<"main" | "adjust" | "invest" | "confirm" | "success" | "balance">("main");
   const [allocations, setAllocations] = useState<number[]>([30, 40, 30]);
   const [amount, setAmount] = useState<string>("50");
   const [frequency, setFrequency] = useState<string>("Weekly");
+  const [isLoading, setIsLoading] = useState(false);
 
   if (screen === "invest") {
     return (
@@ -33,12 +35,33 @@ export default function Home() {
 
   async function handleConfirm() {
     console.log("Confirming plan", allocations, amount, frequency);
-    const res = await fetch("/api/dca", {
-      method: "POST",
-      body: JSON.stringify({ allocations, amount, frequency }),
-    });
-    const data = await res.json();
-    console.log("DCA response", data);
+    setIsLoading(true);
+    try {
+      const res = await fetch("/api/dca", {
+        method: "POST",
+        body: JSON.stringify({ allocations, amount, frequency }),
+      });
+      const data = await res.json();
+      console.log("DCA response", data);
+      
+      if (res.ok) {
+        // API call successful, show success page
+        setScreen("success");
+      } else {
+        // Handle error case
+        console.error("DCA failed:", data);
+        // You might want to show an error message here
+      }
+    } catch (error) {
+      console.error("DCA request failed:", error);
+      // Handle network error
+    } finally {
+      setIsLoading(false);
+    }
+  }
+
+  function handleCancelLoading() {
+    setIsLoading(false);
   }
 
   if (screen === "adjust") {
@@ -68,6 +91,20 @@ export default function Home() {
         amount={amount} 
         frequency={frequency}
         onConfirm={handleConfirm}
+        onSuccess={() => setScreen("success")}
+        isLoading={isLoading}
+        onCancelLoading={handleCancelLoading}
+      />
+    );
+  }
+
+  if (screen === "success") {
+    return (
+      <PlanSuccessPage
+        amount={amount}
+        frequency={frequency}
+        cardLast4="4242"
+        onBackToHome={() => setScreen("main")}
       />
     );
   }
