@@ -29,11 +29,13 @@ mongoose
 // Import routes
 const fearGreedRoutes = require("./routes/fearGreed");
 const worldcoinNotificationRoutes = require("./routes/worldcoinNotifications");
+const tragicNewsRoutes = require("./routes/tragicNews");
 
 // Routes
 
 app.use("/api/fear-greed", fearGreedRoutes);
 app.use("/api/worldcoin-notifications", worldcoinNotificationRoutes);
+app.use("/api/tragic-news", tragicNewsRoutes);
 
 // Health check endpoint
 app.get("/health", (req, res) => {
@@ -53,6 +55,7 @@ app.get("/", (req, res) => {
       health: "/health",
       fearGreed: "/api/fear-greed",
       worldcoinNotifications: "/api/worldcoin-notifications",
+      tragicNews: "/api/tragic-news",
     },
   });
 });
