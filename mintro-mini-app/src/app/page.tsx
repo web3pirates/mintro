@@ -10,6 +10,7 @@ import InvestAmountPage from "../components/InvestAmountPage";
 import ConfirmPlanPage from "@/components/ConfirmPlanPage";
 import { WalletBalance } from "@/components/WalletBalance";
 import { Navigation } from "@/components/Navigation";
+import { MoveToStables } from "@/components/MoveToStables";
 
 export default function Home() {
   const [screen, setScreen] = useState<"main" | "adjust" | "invest" | "confirm" | "balance">("main");
@@ -75,6 +76,7 @@ export default function Home() {
     return (
       <div className="min-h-screen bg-gray-100 flex flex-col items-center justify-center relative pb-24">
         <div className="max-w-md w-full mx-auto p-4 flex flex-col gap-4">
+          <MoveToStables/>
           <WalletBalance />
         </div>
         <div className="p-2 w-full">
