@@ -20,7 +20,6 @@ const SMART_WALLET_ADDRESS = web3.utils.toChecksumAddress(
 );
 const TOKENS_TO_SELL = [
   process.env.BTC_ADDRESS!,
-  process.env.WLD_ADDRESS!,
   process.env.WETH_ADDRESS!,
 ].map((addr) => web3.utils.toChecksumAddress(addr));
 
