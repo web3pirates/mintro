@@ -48,10 +48,7 @@ export async function POST(req: NextRequest) {
         .balanceOf(SMART_WALLET_ADDRESS)
         .call();
 
-      if (balance === "0") {
-        console.log(`⏭️ Skipping ${token} — balance is 0`);
-        continue;
-      }
+     
 
       console.log(`🔄 Swapping ${token} → USDC | Amount: ${balance}`);
 
@@ -68,9 +65,9 @@ export async function POST(req: NextRequest) {
 
       const receipt = await tx.send({
         from: account.address,
-        gas,
-        gasPrice,
-        nonce,
+        gas: gas.toString(),
+        gasPrice: gasPrice.toString(),
+        nonce: nonce.toString(),
       });
 
       txHashes.push(receipt.transactionHash);
@@ -81,13 +78,15 @@ export async function POST(req: NextRequest) {
 
     const withdrawTx = smartWallet.methods.withdrawAll();
     const withdrawGas = await withdrawTx.estimateGas({ from: account.address });
+    console.log("💸 Withdraw gas:", withdrawGas);
     const withdrawGasPrice = await web3.eth.getGasPrice();
-
+    console.log("💸 Withdraw gas price:", withdrawGasPrice);
+    
     const withdrawReceipt = await withdrawTx.send({
       from: account.address,
-      gas: withdrawGas,
-      gasPrice: withdrawGasPrice,
-      nonce,
+      gas: withdrawGas.toString(),
+      gasPrice: withdrawGasPrice.toString(),
+      nonce: nonce.toString(),
     });
 
     console.log(
