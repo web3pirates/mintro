@@ -125,26 +125,24 @@ function SummaryText({
   );
 }
 
-function SuccessPopup({ isVisible, onClose }: { isVisible: boolean; onClose: () => void }) {
+function LoaderPopup({ isVisible, onClose, onBack }: { isVisible: boolean; onClose: () => void; onBack?: () => void }) {
   if (!isVisible) return null;
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-2xl p-8 max-w-sm w-full text-center shadow-2xl animate-in fade-in duration-300">
-        <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-          <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-          </svg>
+        <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600"></div>
         </div>
-        <h3 className="text-xl font-bold text-gray-900 mb-2">Plan Confirmed!</h3>
+        <h3 className="text-xl font-bold text-gray-900 mb-2">Processing...</h3>
         <p className="text-gray-600 mb-6">
-          Your investment plan has been successfully created. We'll start managing your portfolio right away.
+          We're setting up your investment plan. This will just take a moment.
         </p>
         <button
-          onClick={onClose}
+          onClick={onBack || onClose}
           className="w-full bg-purple-600 text-white font-semibold py-3 px-6 rounded-xl hover:bg-purple-700 transition-colors"
         >
-          Got it
+          Cancel
         </button>
       </div>
     </div>
@@ -157,17 +155,22 @@ export default function ConfirmPlanPage({
   frequency,
   onBack,
   onConfirm,
+  onSuccess,
+  isLoading = false,
+  onCancelLoading,
 }: {
   allocations: number[];
   amount: string;
   frequency: string;
   onBack?: () => void;
   onConfirm?: () => void;
+  onSuccess?: () => void;
+  isLoading?: boolean;
+  onCancelLoading?: () => void;
 }) {
   const [showSuccess, setShowSuccess] = useState(false);
 
   const handleConfirm = () => {
-    setShowSuccess(true);
     if (onConfirm) {
       onConfirm();
     }
@@ -175,6 +178,9 @@ export default function ConfirmPlanPage({
 
   const handleCloseSuccess = () => {
     setShowSuccess(false);
+    if (onSuccess) {
+      onSuccess();
+    }
   };
 
   return (
@@ -195,11 +201,12 @@ export default function ConfirmPlanPage({
         <button
           className="w-full rounded-xl !bg-purple-600 !text-white font-bold text-xl !py-3 mt-auto !shadow-md hover:bg-purple-800 transition"
           onClick={handleConfirm}
+          disabled={isLoading}
         >
-          Confirm
+          {isLoading ? "Processing..." : "Confirm"}
         </button>
       </div>
-      <SuccessPopup isVisible={showSuccess} onClose={handleCloseSuccess} />
+      <LoaderPopup isVisible={isLoading} onClose={handleCloseSuccess} onBack={onCancelLoading} />
     </div>
   );
 }
