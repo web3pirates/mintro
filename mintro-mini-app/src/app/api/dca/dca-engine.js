@@ -6,7 +6,7 @@ import smartWalletAbi from "./abi/SmartWalletAbi.json"
 
 dotenv.config();
 
-// Init Web3
+
 const web3 = new Web3(process.env.WORLDCHAIN_RPC_URL);
 const account = web3.eth.accounts.privateKeyToAccount(
   process.env.OPERATOR_PRIVATE_KEY
