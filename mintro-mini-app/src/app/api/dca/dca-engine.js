@@ -14,22 +14,10 @@ const account = web3.eth.accounts.privateKeyToAccount(
 );
 web3.eth.accounts.wallet.add(account);
 
-
-
-if (hasBlockchainConfig) {
-  const Web3 = require("web3").default || require("web3");
-  const { MongoClient } = require("mongodb");
-
-  // Init Web3
-  web3 = new Web3(process.env.WORLDCHAIN_RPC_URL);
-  account = web3.eth.accounts.privateKeyToAccount(process.env.OPERATOR_PRIVATE_KEY);
-  web3.eth.accounts.wallet.add(account);
-
-  // Setup MongoDB
-  client = new MongoClient(process.env.MONGODB_URI);
-  db = client.db("mintro-db");
-  trades = db.collection("transactions");
-}
+// Setup MongoDB
+const client = new MongoClient(process.env.MONGODB_URI);
+const db = client.db("mintro-db");
+const trades = db.collection("transactions");
 
 // Token addresses (with fallbacks)
 const toChecksum = (address) => {
@@ -157,9 +145,7 @@ async function executeCategory(
   const totalPerc = Object.values(tokenMap).reduce((sum, p) => sum + p, 0);
   
   let nonce = 0;
-  if (hasBlockchainConfig) {
-    nonce = await web3.eth.getTransactionCount(account.address, "pending");
-  }
+  nonce = await web3.eth.getTransactionCount(account.address, "pending");
 
   for (const [token, perc] of Object.entries(tokenMap)) {
     const share = perc / totalPerc;
@@ -172,20 +158,11 @@ async function executeCategory(
 export async function executeDCA() {
   console.log("📈 Executing monthly DCA strategy...");
   
-  if (hasBlockchainConfig) {
-    await client.connect();
-  }
+  await client.connect();
 
   const smartWalletAddress = process.env.SMART_WALLET_ADDRESS || "0x1234567890123456789012345678901234567890";
   
-  if (!hasBlockchainConfig) {
-    console.log("⚠️  Running in MOCK mode - no blockchain configuration found");
-    console.log("📋 Required environment variables:");
-    console.log("   - WORLDCHAIN_RPC_URL");
-    console.log("   - OPERATOR_PRIVATE_KEY");
-    console.log("   - MONGODB_URI");
-    console.log("   - SMART_WALLET_ADDRESS");
-  }
+  
 
   await executeCategory(
     "institutional",
@@ -195,23 +172,10 @@ export async function executeDCA() {
   );
   // await executeCategory("memecoin", amountMemecoin, memecoinTokens, smartWalletAddress);
 
-  if (hasBlockchainConfig) {
-    await client.close();
-  }
+  await client.close();
   
   console.log("✅ DCA execution completed successfully!");
 }
 
-// ======= CRON JOB =======
-if (hasBlockchainConfig) {
-  const cron = require("node-cron");
-  cron.schedule("0 10 1 * *", () => {
-    executeDCA().catch(console.error);
-  });
-  console.log("🚀 DCA bot is running...");
-}
 
-// Run immediately for test
-// executeDCA().catch(console.error);
 
-export { executeDCA };
