@@ -1,6 +1,6 @@
 # Nudge - Smart, Sentiment-Aware Crypto Investing
 
-Nudge is a Worldcoin Mini App that makes crypto investing simple, automated, and adaptive to market conditions. Users select a pre-built portfolio and set up a recurring buy using their credit card. From there, Nudge automates portfolio management — shifting assets into USDC when market sentiment turns bearish, and redeploying when sentiment improves. While funds are in USDC, Nudge puts them to work in low-risk DeFi strategies to earn passive yield.
+Nudge is a Worldcoin Mini App that makes crypto investing simple, automated, and adaptive to market conditions. Users select a pre-built portfolio and set up a recurring buy using their credit card. From there, Nudge automates portfolio management, shifting assets into USDC when market sentiment turns bearish, and redeploying when sentiment improves. While funds are in USDC, Nudge puts them to work in low-risk DeFi strategies to earn passive yield.
 
 ## 🏆 Built with Three Leading Sponsors
 
@@ -15,6 +15,7 @@ Nudge is a Worldcoin Mini App that makes crypto investing simple, automated, and
 
 - **Developer-Controlled Wallets**: Secure wallet management for automated trading operations
 - **USDC Integration**: Stablecoin foundation for risk management and yield generation
+- **CCTP V2**: Cross-chain transactions for an easier investment experience.
 
 ### **Privy** - Authentication & User Management
 
@@ -86,9 +87,9 @@ Nudge is a Worldcoin Mini App that makes crypto investing simple, automated, and
 ### **Blockchain**
 
 - World Chain for primary operations
-- Smart contracts for wallet management
-- Uniswap V2 for token swaps
-- ERC-4337 Account Abstraction
+- Smart contracts for wallet management, and Foundry for contract deployment
+- Uniswap V2 for token swaps, and Uniswap V3 for liquidity providing
+- ERC-4337 Account Abstraction with Smart Wallets.
 
 ### **APIs & Services**
 
@@ -129,6 +130,6 @@ Nudge is a Worldcoin Mini App that makes crypto investing simple, automated, and
 
 ## 🌟 Why Nudge?
 
-Nudge represents the future of crypto investing - where sophisticated market intelligence meets simple, automated execution. By leveraging the combined power of Worldcoin's identity infrastructure, Circle's cross-chain capabilities, and Privy's authentication system, we've created a platform that makes institutional-grade crypto investing accessible to everyone.
+Nudge represents the future of crypto investing, where sophisticated market intelligence meets simple, automated execution. By leveraging the combined power of Worldcoin's identity infrastructure, Circle's cross-chain capabilities, and Privy's authentication system, we've created a platform that makes institutional-grade crypto investing accessible to everyone.
 
 Whether you're a crypto newcomer looking to start your investment journey or an experienced trader seeking automated portfolio management, Nudge provides the tools, intelligence, and security you need to succeed in the digital asset markets.
