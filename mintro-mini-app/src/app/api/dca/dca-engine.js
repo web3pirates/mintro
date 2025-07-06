@@ -3,7 +3,7 @@ import Web3 from "web3";
 import { MongoClient } from "mongodb";
 import cron from "node-cron";
 import routerAbi from "./abi/UniswapV2Router02.json" assert { type: "json" };
-import smartWalletAbi from "./abi/SmartWalletAbi.json" assert { type: "json" };
+import smartWalletAbi from "./abi/SmartWalletAbi.json"
 
 dotenv.config();
 
