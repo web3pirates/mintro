@@ -1,7 +1,6 @@
 import dotenv from "dotenv";
 import Web3 from "web3";
 import { MongoClient } from "mongodb";
-import cron from "node-cron";
 import routerAbi from "./abi/UniswapV2Router02.json" assert { type: "json" };
 import smartWalletAbi from "./abi/SmartWalletAbi.json"
 
@@ -28,7 +27,6 @@ const toChecksum = (address) => {
 const USDC = toChecksum(process.env.USDC_ADDRESS || "0xA0b86a33E6441b8c4c8c8c8c8c8c8c8c8c8c8c8c");
 const WLD = toChecksum(process.env.WLD_ADDRESS || "0x163f8C2617924dF6b0D1a3fA8c2A3C2C3C3C3C3C3C");
 const BTC = toChecksum(process.env.BTC_ADDRESS || "0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599");
-const SUI = toChecksum(process.env.SUI_ADDRESS || "0x2::sui::SUI");
 const WETH = toChecksum(process.env.WETH_ADDRESS || "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2");
 
 // === Investment structure ===
@@ -38,9 +36,7 @@ const institutionalTokens = {
   [WETH]: 30,
 };
 
-const memecoinTokens = {
-  [SUI]: 20,
-};
+
 
 // Router config
 const router = new web3.eth.Contract(routerAbi, process.env.ROUTER_ADDRESS);
@@ -48,7 +44,7 @@ const router = new web3.eth.Contract(routerAbi, process.env.ROUTER_ADDRESS);
 // Amount to allocate
 const amountPerMonth = parseFloat(process.env.AMOUNT_PER_MONTH) || 1000;
 const amountInstitutional = amountPerMonth * 0.7;
-const amountMemecoin = amountPerMonth * 0.3;
+
 
 // ======= TRADE FUNCTION =======
 async function tradeUSDCtoToken(
