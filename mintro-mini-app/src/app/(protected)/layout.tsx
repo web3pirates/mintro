@@ -14,8 +14,13 @@ export default function TabsLayout({
   const { isAuthenticated, isLoading } = useWorldcoinAuth();
   const router = useRouter();
 
+  // Debug logging
+  console.log('Protected Layout Debug:', { isAuthenticated, isLoading, pathname: typeof window !== 'undefined' ? window.location.pathname : 'SSR' });
+
   // If the user is not authenticated and not loading, redirect to the login page
   useEffect(() => {
+    console.log('Protected Layout useEffect:', { isAuthenticated, isLoading });
+    
     if (!isLoading && !isAuthenticated) {
       console.log("Not authenticated, redirecting to login");
       router.push("/");
@@ -24,6 +29,7 @@ export default function TabsLayout({
 
   // Show loading while checking authentication
   if (isLoading) {
+    console.log('Protected Layout: Showing loading state');
     return (
       <Page>
         <Page.Main className="flex items-center justify-center">
@@ -37,9 +43,11 @@ export default function TabsLayout({
 
   // Don't render protected content if not authenticated
   if (!isAuthenticated) {
+    console.log('Protected Layout: Not authenticated, returning null');
     return null;
   }
 
+  console.log('Protected Layout: Rendering protected content');
   return (
     <Page>
       {children}

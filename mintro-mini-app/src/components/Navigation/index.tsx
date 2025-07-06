@@ -1,25 +1,40 @@
 'use client';
 
 import { TabItem, Tabs } from '@worldcoin/mini-apps-ui-kit-react';
-import { Bank, Home, User } from 'iconoir-react';
-import { useState } from 'react';
+import { Bank, Home, User, Wallet } from 'iconoir-react';
+import { useState, useEffect } from 'react';
 
-/**
- * This component uses the UI Kit to navigate between pages
- * Bottom navigation is the most common navigation pattern in Mini Apps
- * We require mobile first design patterns for mini apps
- * Read More: https://docs.world.org/mini-apps/design/app-guidelines#mobile-first
- */
-
-export const Navigation = () => {
+export const Navigation = ({ setScreen }: { setScreen: (screen: "main" | "adjust" | "invest" | "confirm" | "balance") => void }) => {
   const [value, setValue] = useState('home');
 
+  const handleValueChange = (newValue: string) => {
+    console.log('handleValueChange called:', { newValue, currentValue: value });
+    
+    // Prevent unnecessary navigation if already on the correct tab
+    if (newValue === value) {
+      console.log('Already on correct tab, skipping navigation');
+      return;
+    }
+    
+    setValue(newValue);
+    
+    // Set the appropriate screen
+    if (newValue === 'home') {
+      console.log('Setting screen to main');
+      setScreen('main');
+    } else if (newValue === 'wallet') {
+      console.log('Setting screen to main (wallet view)');
+      setScreen('main');
+    } else if (newValue === 'walletbalance') {
+      console.log('Setting screen to balance');
+      setScreen('balance');
+    }
+  };
+
   return (
-    <Tabs value={value} onValueChange={setValue}>
+    <Tabs value={value} onValueChange={handleValueChange}>
       <TabItem value="home" icon={<Home />} label="Home" />
-      {/* // TODO: These currently don't link anywhere */}
-      <TabItem value="wallet" icon={<Bank />} label="Wallet" />
-      <TabItem value="profile" icon={<User />} label="Profile" />
+      <TabItem value="walletbalance" icon={<Wallet />} label="Balance" />
     </Tabs>
   );
 };
