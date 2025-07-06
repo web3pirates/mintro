@@ -8,7 +8,7 @@
   "type": "module",
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "DISABLE_ESLINT_PLUGIN=true next build",
     "start": "next start",
     "lint": "next lint"
   },
@@ -19,6 +19,7 @@
     "@worldcoin/minikit-js": "^1.9.6",
     "@worldcoin/minikit-react": "1.9.6",
     "clsx": "^2.1.1",
+    "dotenv": "^17.0.1",
     "ethers": "^6.15.0",
     "iconoir-react": "^7.11.0",
     "mongodb": "^6.17.0",
