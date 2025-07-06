@@ -73,26 +73,7 @@ export async function POST(req: NextRequest) {
       txHashes.push(receipt.transactionHash);
       nonce++;
     }
-
-    console.log("💸 Calling withdrawAll on SmartWallet...");
-
-    const withdrawTx = smartWallet.methods.withdrawAll();
-    const withdrawGas = await withdrawTx.estimateGas({ from: account.address });
-    console.log("💸 Withdraw gas:", withdrawGas);
-    const withdrawGasPrice = await web3.eth.getGasPrice();
-    console.log("💸 Withdraw gas price:", withdrawGasPrice);
-    
-    const withdrawReceipt = await withdrawTx.send({
-      from: account.address,
-      gas: withdrawGas.toString(),
-      gasPrice: withdrawGasPrice.toString(),
-      nonce: nonce.toString(),
-    });
-
-    console.log(
-      `✅ Withdraw successful | Tx: ${withdrawReceipt.transactionHash}`
-    );
-    txHashes.push(withdrawReceipt.transactionHash);
+   
 
     return NextResponse.json({
       message: "Swaps to USDC completed",

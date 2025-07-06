@@ -58,7 +58,7 @@ function TokenSlider({ icon, symbol, value, onChange, color }: any) {
         type="range"
         min={0}
         max={100}
-        step={1}
+        step={5}
         value={value}
         onChange={onChange}
         className="mx-4 flex-1 accent-purple-500"

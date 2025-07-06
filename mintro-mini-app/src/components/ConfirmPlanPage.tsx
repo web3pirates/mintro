@@ -117,7 +117,7 @@ function SummaryText({
     <div className="text-center text-lg font-medium mt-2 mb-8 !text-black">
       You&apos;re investing{" "}
       <span className="!font-bold !text-purple-700">${amount}</span> on a{" "}
-      <span className="font-bold text-purple-700">
+      <span className="!font-bold text-purple-700">
         {frequency.toLowerCase()}
       </span>{" "}
       basis.
