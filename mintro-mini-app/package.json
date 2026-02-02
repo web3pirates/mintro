@@ -23,7 +23,7 @@
     "ethers": "^6.15.0",
     "iconoir-react": "^7.11.0",
     "mongodb": "^6.17.0",
-    "next": "15.2.3",
+    "next": "15.2.8",
     "next-auth": "^5.0.0-beta.25",
     "node-cron": "^4.2.0",
     "react": "^19.0.0",
